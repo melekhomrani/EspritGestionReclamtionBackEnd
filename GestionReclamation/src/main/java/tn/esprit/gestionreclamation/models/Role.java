@@ -22,12 +22,12 @@ public class Role {
     @GeneratedValue
     private Long id;
     @Column(unique = true)
-    private String roleName;
+    private String name;
     @JsonIgnore
     @OneToMany(mappedBy = "role")
     private List<Users> users;
     @CreationTimestamp
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    private LocalDateTime dateCreation;
     @UpdateTimestamp
-    private LocalDateTime dateModification = LocalDateTime.now();
+    private LocalDateTime dateModification;
 }

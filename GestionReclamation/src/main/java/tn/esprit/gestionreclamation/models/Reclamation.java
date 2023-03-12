@@ -22,7 +22,7 @@ public class Reclamation {
     @GeneratedValue
     private Long id;
     @NotBlank
-    private String object;
+    private String subject;
     @NotBlank
     private String description;
     @ManyToOne
@@ -32,7 +32,7 @@ public class Reclamation {
     @ManyToOne
     private ReclamationType type;
     @CreationTimestamp
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    private LocalDateTime dateCreation;
     @UpdateTimestamp
-    private LocalDateTime dateUpdate = LocalDateTime.now();
+    private LocalDateTime dateUpdate;
 }

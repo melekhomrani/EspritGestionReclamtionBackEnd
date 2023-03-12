@@ -3,53 +3,56 @@ package tn.esprit.gestionreclamation.auth;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tn.esprit.gestionreclamation.config.JwtService;
-import tn.esprit.gestionreclamation.dto.UserLoginRequestDto;
-import tn.esprit.gestionreclamation.dto.UserRegisterRequestDto;
-import tn.esprit.gestionreclamation.models.UserRole;
+import tn.esprit.gestionreclamation.exceptions.AlreadyExistsException;
+import tn.esprit.gestionreclamation.models.Role;
 import tn.esprit.gestionreclamation.models.Users;
+import tn.esprit.gestionreclamation.repositories.RoleRepository;
 import tn.esprit.gestionreclamation.repositories.UserRepository;
-import tn.esprit.gestionreclamation.services.RoleService;
-import tn.esprit.gestionreclamation.services.UserService;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
-    public ResponseEntity<AuthenticationResponse> register(UserRegisterRequestDto registerRequest) throws EntityNotFoundException {
-        try {
-            Users user = userService.saveUser(registerRequest);
-            var jwt = jwtService.generateToken(user);
-            return ResponseEntity.ok(AuthenticationResponse.builder().token(jwt).build());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    public ResponseEntity<AuthenticationResponse> register(UserRegisterRequest registerRequest) {
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new AlreadyExistsException("User already exists");
         }
+        Role role = roleRepository.findById(registerRequest.getRoleId())
+                .orElseThrow(() -> new EntityNotFoundException("Role not found"));
+        Users user = Users.builder()
+                .email(registerRequest.getEmail())
+                .firstName(registerRequest.getFirstName())
+                .lastName(registerRequest.getLastName())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .role(role)
+                .build();
+        userRepository.saveAndFlush(user);
+        var jwt = jwtService.generateToken(user);
+        return ResponseEntity.ok(AuthenticationResponse.builder().token(jwt).build());
     }
 
-    public ResponseEntity<AuthenticationResponse> login(UserLoginRequestDto loginRequest) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getEmail(),
-                            loginRequest.getPassword()
-                    )
-            );
-            var user = userService.getUserByEmail(loginRequest.getEmail())
-                    .orElseThrow(() -> new EntityNotFoundException("User not Found"));
-            var jwt = jwtService.generateToken(user);
-            return ResponseEntity.ok(AuthenticationResponse.builder().token(jwt).build());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<AuthenticationResponse> login(UserLoginRequest loginRequest) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
+        );
+        var user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException("Login failed, User not found"));
+        var jwt = jwtService.generateToken(user);
+        return ResponseEntity.ok(AuthenticationResponse.builder().token(jwt).build());
     }
 }

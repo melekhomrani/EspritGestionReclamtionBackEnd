@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReclamationDto {
+public class ReclamationRequest {
     private String object;
     private String description;
     private String type;

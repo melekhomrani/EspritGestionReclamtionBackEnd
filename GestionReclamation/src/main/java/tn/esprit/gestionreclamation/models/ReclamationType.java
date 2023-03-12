@@ -21,7 +21,7 @@ public class ReclamationType {
     private Long id;
     private String typeName;
     @CreationTimestamp
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    private LocalDateTime dateCreation;
     @UpdateTimestamp
-    private LocalDateTime dateModification = LocalDateTime.now();
+    private LocalDateTime dateModification;
 }

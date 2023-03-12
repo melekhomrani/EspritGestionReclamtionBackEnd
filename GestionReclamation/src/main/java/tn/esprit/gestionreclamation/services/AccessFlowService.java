@@ -1,46 +1,74 @@
 package tn.esprit.gestionreclamation.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tn.esprit.gestionreclamation.dto.AccessFlowRequest;
 import tn.esprit.gestionreclamation.models.AccessFlow;
+import tn.esprit.gestionreclamation.models.Role;
 import tn.esprit.gestionreclamation.repositories.AccessFlowRepository;
-import tn.esprit.gestionreclamation.services.IService.IAccessFlowService;
 
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class AccessFlowService implements IAccessFlowService {
+public class AccessFlowService {
 
     private final AccessFlowRepository accessFlowRepository;
+    private final ReclamationTypeService reclamationTypeService;
+    private final RoleService roleService;
 
-    @Override
     public List<AccessFlow> getAllAccessFlow() {
         return accessFlowRepository.findAll();
     }
 
-    @Override
-    public Optional<AccessFlow> getAccessFlowById(Long id) {
-        return accessFlowRepository.findById(id);
+    public AccessFlow getAccessFlowById(Long id) {
+        AccessFlow accessFlow = accessFlowRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("AccessFlow not found"));
+        return accessFlowRepository.findById(accessFlow.getId()).get();
     }
 
-    @Override
     public AccessFlow saveAccessFlow(AccessFlow accessFlow) {
+        Optional<AccessFlow> checkAccessFlow = accessFlowRepository.findById(accessFlow.getId());
+        if (checkAccessFlow.isPresent()) {
+            throw new EntityNotFoundException("AccessFlow already exists");
+        }
+        //todo : naaresh bedhabet
+
+        AccessFlow accessFlowToSave = AccessFlow.builder()
+                .reclamationType(accessFlow.getReclamationType())
+                .approve(accessFlow.getApprove())
+                .consult(accessFlow.getConsult())
+                .create(accessFlow.getCreate())
+                .notify(accessFlow.getNotify())
+                .validate(accessFlow.getValidate())
+                .build();
         return accessFlowRepository.save(accessFlow);
     }
 
-    @Override
     public List<AccessFlow> saveAccessFlows(List<AccessFlow> accessFlows) {
         return accessFlowRepository.saveAllAndFlush(accessFlows);
     }
 
-    @Override
-    public AccessFlow updateAccessFlow(AccessFlow accessFlow) {
-        return accessFlowRepository.save(accessFlow);
+    public AccessFlow updateAccessFlow(Long id, AccessFlowRequest accessFlow) {
+        AccessFlow accessFlowToUpdate = accessFlowRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("AccessFlow not found"));
+        List<Role> approveRoles = roleService.getRolesByIds(accessFlow.getApproveId().stream().toList());
+        List<Role> consultRoles = roleService.getRolesByIds(accessFlow.getConsultId().stream().toList());
+        List<Role> creatRoles = roleService.getRolesByIds(accessFlow.getCreateId().stream().toList());
+        List<Role> notifyRoles = roleService.getRolesByIds(accessFlow.getNotifyId().stream().toList());
+        List<Role> validateRoles = roleService.getRolesByIds(accessFlow.getValidateId().stream().toList());
+        accessFlowToUpdate.setReclamationType(reclamationTypeService.getReclamationTypeById(accessFlow.getReclamationTypeId()));
+        accessFlowToUpdate.setApprove(approveRoles);
+        accessFlowToUpdate.setConsult(consultRoles);
+        accessFlowToUpdate.setCreate(creatRoles);
+        accessFlowToUpdate.setNotify(notifyRoles);
+        accessFlowToUpdate.setValidate(validateRoles);
+        return accessFlowRepository.save(accessFlowToUpdate);
+
     }
 
-    @Override
     public void deleteAccessFlow(Long id) {
         accessFlowRepository.deleteById(id);
     }

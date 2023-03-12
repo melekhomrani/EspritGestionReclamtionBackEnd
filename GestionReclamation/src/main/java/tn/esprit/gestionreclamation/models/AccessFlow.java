@@ -33,8 +33,8 @@ public class AccessFlow {
     @ManyToMany
     private List<Role> validate;
     @CreationTimestamp
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    private LocalDateTime dateCreation;
     @UpdateTimestamp
-    private LocalDateTime dateModification = LocalDateTime.now();
+    private LocalDateTime dateModification;
 
 }

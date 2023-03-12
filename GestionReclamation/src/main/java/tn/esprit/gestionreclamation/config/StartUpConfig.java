@@ -7,7 +7,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import tn.esprit.gestionreclamation.dto.UserResponse;
 import tn.esprit.gestionreclamation.models.*;
+import tn.esprit.gestionreclamation.repositories.*;
 import tn.esprit.gestionreclamation.services.*;
 
 import java.util.List;
@@ -17,27 +19,25 @@ import java.util.List;
 @Slf4j
 public class StartUpConfig {
     @Bean
-    CommandLineRunner initDatabase(UserService userService,
+    CommandLineRunner initDatabase(UserRepository userRepository,
                                    PasswordEncoder passwordEncoder,
-                                   RoleService roleService,
-                                   ReclamationService reclamationService,
-                                   ReclamationTypeService reclamationTypeService,
-                                   AccessFlowService accessFlowService) {
+                                   RoleRepository roleRepository,
+                                   ReclamationRepository reclamationRepository,
+                                   ReclamationTypeRepository reclamationTypeRepository,
+                                   AccessFlowRepository accessFlowRepository) {
         return args -> {
-            Role admin = Role.builder().roleName("ADMIN").build();
-            Role user = Role.builder().roleName("USER").build();
-            Role moderator = Role.builder().roleName("MODERATOR").build();
-            Role student = Role.builder().roleName("STUDENT").build();
-            Role teacher = Role.builder().roleName("TEACHER").build();
-            roleService.saveRoles(List.of(admin, user, moderator, student, teacher));
-
+            Role admin = Role.builder().name("ADMIN").build();
+            Role user = Role.builder().name("USER").build();
+            Role moderator = Role.builder().name("MODERATOR").build();
+            Role student = Role.builder().name("STUDENT").build();
+            Role teacher = Role.builder().name("TEACHER").build();
+            roleRepository.saveAllAndFlush(List.of(admin, user, moderator, student, teacher));
             Users adminUser = Users.builder()
                     .email("admin@esprit.tn")
                     .password(passwordEncoder.encode("admin"))
                     .firstName("Admin")
                     .lastName("Admin")
                     .role(admin)
-                    .userRole(UserRole.ADMIN)
                     .build();
             Users userUser = Users.builder()
                     .email("user@esprit.tn")
@@ -45,7 +45,6 @@ public class StartUpConfig {
                     .firstName("User")
                     .lastName("User")
                     .role(user)
-                    .userRole(UserRole.USER)
                     .build();
             Users moderatorUser = Users.builder()
                     .email("moderator@essprit.tn")
@@ -53,7 +52,6 @@ public class StartUpConfig {
                     .firstName("Moderator")
                     .lastName("Moderator")
                     .role(moderator)
-                    .userRole(UserRole.USER)
                     .build();
             Users studentUser = Users.builder()
                     .email("student@esprit.tn")
@@ -61,7 +59,6 @@ public class StartUpConfig {
                     .firstName("Student")
                     .lastName("Student")
                     .role(student)
-                    .userRole(UserRole.USER)
                     .build();
             Users teacherUser = Users.builder()
                     .email("teacher@esprit.tn")
@@ -69,16 +66,15 @@ public class StartUpConfig {
                     .firstName("Teacher")
                     .lastName("Teacher")
                     .role(teacher)
-                    .userRole(UserRole.USER)
                     .build();
-            userService.saveUsers(List.of(adminUser, userUser, moderatorUser, studentUser, teacherUser));
+            userRepository.saveAllAndFlush(List.of(adminUser, userUser, moderatorUser, studentUser, teacherUser));
 
             log.info("Users created");
 
             ReclamationType bug = ReclamationType.builder().typeName("Bug").build();
             ReclamationType feature = ReclamationType.builder().typeName("Feature").build();
             ReclamationType task = ReclamationType.builder().typeName("Task").build();
-            reclamationTypeService.saveReclamationTypes(List.of(bug, feature, task));
+            reclamationTypeRepository.saveAllAndFlush(List.of(bug, feature, task));
 
             log.info("Reclamation types created");
 
@@ -106,18 +102,18 @@ public class StartUpConfig {
                     .approve(List.of(admin, moderator))
                     .validate(List.of(admin))
                     .build();
-            accessFlowService.saveAccessFlows(List.of(accessFlowBug, accessFlowFeature, accessFlowTask));
+            accessFlowRepository.saveAllAndFlush(List.of(accessFlowBug, accessFlowFeature, accessFlowTask));
 
             log.info("Access flows created");
 
             Reclamation reclamation = Reclamation.builder()
-                    .object("Bug 1")
+                    .subject("Bug 1")
                     .description("Bug 1 description")
                     .type(bug)
                     .author(studentUser)
                     .progress(Progress.WAITING)
                     .build();
-            reclamationService.saveReclamation(reclamation);
+            reclamationRepository.save(reclamation);
 
             log.info("Reclamations created");
 

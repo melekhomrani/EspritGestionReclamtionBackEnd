@@ -1,4 +1,4 @@
-package tn.esprit.gestionreclamation.dto;
+package tn.esprit.gestionreclamation.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserLoginRequestDto {
+public class UserLoginRequest {
     private String email;
     private String password;
 }

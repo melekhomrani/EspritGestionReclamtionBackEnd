@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,17 +44,17 @@ public class Users implements UserDetails {
     private String lastName;
     @ManyToOne
     private Role role;
-    @Enumerated(EnumType.STRING)
-    private UserRole userRole = UserRole.USER;
     @CreationTimestamp
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime dateCreation;
     @UpdateTimestamp
-    private LocalDateTime dateModification = LocalDateTime.now();
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime dateModification;
 
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(userRole.name()));
+        return List.of(new SimpleGrantedAuthority(role.getName()), new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tn.esprit.gestionreclamation.dto.UserLoginRequestDto;
-import tn.esprit.gestionreclamation.dto.UserRegisterRequestDto;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -16,20 +14,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody UserRegisterRequestDto registerRequest) {
-        try {
-            return authService.register(registerRequest);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody UserRegisterRequest registerRequest) throws Exception {
+        return authService.register(registerRequest);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody UserLoginRequestDto loginRequest) {
-        try {
-            return authService.login(loginRequest);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<AuthenticationResponse> login (@RequestBody UserLoginRequest loginRequest) throws Exception {
+        return authService.login(loginRequest);
     }
 }

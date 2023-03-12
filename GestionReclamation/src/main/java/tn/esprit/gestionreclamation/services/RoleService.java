@@ -1,50 +1,64 @@
 package tn.esprit.gestionreclamation.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tn.esprit.gestionreclamation.exceptions.AlreadyExistsException;
 import tn.esprit.gestionreclamation.models.Role;
 import tn.esprit.gestionreclamation.repositories.RoleRepository;
-import tn.esprit.gestionreclamation.services.IService.IRoleService;
 
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class RoleService implements IRoleService {
+public class RoleService {
 
     private final RoleRepository roleRepository;
 
-    @Override
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }
 
-    public Optional<Role> getRoleById(Long id) {
-        return roleRepository.findById(id);
+    public Role getRoleById(Long id) {
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        return roleRepository.findById(role.getId()).get();
     }
 
-    public Optional<Role> getRoleByRoleName(String roleName) {
-        return roleRepository.findByRoleName(roleName);
+    public List<Role> getRolesByIds(List<Long> ids) {
+        return roleRepository.findAllById(ids);
     }
 
-    @Override
+    public Role getRoleByName(String roleName) {
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        return roleRepository.findByName(role.getName()).get();
+    }
+
     public Role saveRole(Role role) {
+        Optional<Role> roleToSave = roleRepository.findByName(role.getName());
+        if (roleToSave.isPresent()) {
+            throw new AlreadyExistsException("Role already exists");
+        }
         return roleRepository.saveAndFlush(role);
     }
 
-    @Override
     public List<Role> saveRoles(List<Role> roles) {
         return roleRepository.saveAllAndFlush(roles);
     }
 
-    @Override
-    public Role updateRole(Role role) {
-        return roleRepository.saveAndFlush(role);
+    public Role updateRole(Long id, Role role) {
+        Role roleToUpdate = roleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Role not found"));
+        roleToUpdate.setName(role.getName());
+        roleToUpdate.setDateModification(role.getDateModification());
+        return roleRepository.saveAndFlush(roleToUpdate);
     }
 
-    @Override
     public void deleteRole(Long id) {
-        roleRepository.deleteById(id);
+        Role roleToDelete = roleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Role not found"));
+        roleRepository.deleteById(roleToDelete.getId());
     }
 }
