@@ -3,11 +3,13 @@ package tn.esprit.gestionreclamation.services;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.apache.catalina.User;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import tn.esprit.gestionreclamation.dto.UserRequest;
 import tn.esprit.gestionreclamation.dto.UserResponse;
+import tn.esprit.gestionreclamation.dto.rabbitmqEvents.UpdateEmailMsg;
+import tn.esprit.gestionreclamation.dto.rabbitmqEvents.UpdatePassword;
 import tn.esprit.gestionreclamation.exceptions.AlreadyExistsException;
 import tn.esprit.gestionreclamation.models.Role;
 import tn.esprit.gestionreclamation.models.Users;
@@ -24,7 +26,7 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
+    private final RabbitTemplate rabbitTemplate;
 
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream().map(this::mapToUserResponse).toList();
@@ -42,13 +44,13 @@ public class UserService {
         return userRepository.findByEmail(user.getEmail()).map(this::mapToUserResponse).get();
     }
 
-    public Users getUserByUserName(String userName) {
+    public Optional<Users> getUserByUserName(String userName) {
         Users user = userRepository.findByEmail(userName)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        return userRepository.findByEmail(user.getEmail()).get();
+        return userRepository.findByEmail(user.getEmail());
     }
 
-    public UserResponse saveUser(UserRequest user) {
+    public UserResponse saveUser(UserRequest user, Long id) {
         Optional<Users> checkUser = userRepository.findByEmail(user.getEmail());
         if (checkUser.isPresent()) {
             throw new AlreadyExistsException("Email address already exists");
@@ -58,7 +60,7 @@ public class UserService {
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .password(passwordEncoder.encode(user.getPassword()))
+                .id(id)
                 .role(role)
                 .build();
         return mapToUserResponse(userRepository.saveAndFlush(newUser));
@@ -76,27 +78,26 @@ public class UserService {
         userToUpdate.setFirstName(user.getFirstName());
         userToUpdate.setLastName(user.getLastName());
         userToUpdate.setRole(role);
+        userRepository.save(userToUpdate);
+        rabbitTemplate.convertAndSend("", "q.update-email", UpdateEmailMsg.builder().email(userToUpdate.getEmail()).id(userToUpdate.getId()).build());
         return mapToUserResponse(userRepository.saveAndFlush(userToUpdate));
     }
 
-    public UserResponse updateUserPassword(Long id, String password) {
-        Users userToUpdate = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        userToUpdate.setPassword(passwordEncoder.encode(password));
-        return mapToUserResponse(userRepository.saveAndFlush(userToUpdate));
+    public boolean updatePassword(Long id, String password){
+        var user = getUserById(id);
+        rabbitTemplate.convertAndSend("", "q.update-password", UpdatePassword.builder().password(password).id(id).build());
+        return true;
     }
 
     public void deleteUser(Long id) {
         Users userToDelete = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         userRepository.deleteById(userToDelete.getId());
+        rabbitTemplate.convertAndSend("","q.delete-user", id);
     }
 
     public Boolean isAdmin(Authentication authentication) {
-        log.info("#################################################################################################");
-        log.info("{}", authentication.getAuthorities().toArray());
-        log.info("#################################################################################################");
-        return authentication.getAuthorities().toArray()[0].toString().equals("ADMIN");
+        return authentication.getProfile().getRole().toString().equals("Admin") || authentication.getAuthorities().equals("Admin");
     }
 
     public Boolean isAuthorized(Role role, List<Role> allowedRoles) {

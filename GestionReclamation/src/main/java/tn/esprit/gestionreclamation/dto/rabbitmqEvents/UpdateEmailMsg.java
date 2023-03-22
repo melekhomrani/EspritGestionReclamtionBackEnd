@@ -1,18 +1,17 @@
-package tn.esprit.gestionreclamation.auth;
+package tn.esprit.gestionreclamation.dto.rabbitmqEvents;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRegisterRequest {
+public class UpdateEmailMsg implements Serializable {
     private String email;
-    private String firstName;
-    private String lastName;
-    private String password;
-    private Long roleId;
+    private Long id;
 }
