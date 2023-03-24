@@ -1,0 +1,22 @@
+version: '1.0'
+services:
+  rabbitmq:
+    image:
+      "rabbitmq:3-management"
+    ports:
+      - 5672:5672
+      - 15672:15672
+    container_name: rabbitmq
+    hostname: rabbitmq3
+  oracledb:
+    image:
+      "gvenzl/oracle-xe"
+    environment:
+      - ORACLE_PASSWORD=root
+      - APP_USER=esprit
+      - APP_USER_PASSWORD=esprit
+    ports:
+      - 1523:1521
+    container_name: oracledb
+    volumes:
+      - /opt/oracle/oradataa

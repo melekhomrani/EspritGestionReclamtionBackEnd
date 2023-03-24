@@ -1,10 +1,10 @@
 package tn.esprit.gestionreclamation.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.gestionreclamation.exceptions.ForbiddenException;
 import tn.esprit.gestionreclamation.models.Role;
+import tn.esprit.gestionreclamation.services.Authentication;
 import tn.esprit.gestionreclamation.services.RoleService;
 import tn.esprit.gestionreclamation.services.UserService;
 

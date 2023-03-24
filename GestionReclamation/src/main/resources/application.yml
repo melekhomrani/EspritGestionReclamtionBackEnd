@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521:XE
-    username: admin
-    password: admin
+    url: ${DB_STRING}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -10,7 +10,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.Oracle10gDialect
     database: oracle
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 server:
-  port: 8081
+  port: 8085
