@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth
+          uri: https://httpbin.org/
+          predicates:
+            - Path=/get
+          filters:
+            - name: Logging
+              args:
+                baseMessage: My Custom Message
+                preLogger: true
+                postLogger: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG
