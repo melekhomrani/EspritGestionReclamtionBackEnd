@@ -9,7 +9,15 @@
         <option value="$PROJECT_DIR$/GestionReclamation/pom.xml" />
         <option value="$PROJECT_DIR$/../gateway/pom.xml" />
         <option value="$PROJECT_DIR$/../authService/pom.xml" />
+        <option value="$PROJECT_DIR$/authService/pom.xml" />
+        <option value="$PROJECT_DIR$/gateway/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/../authService/pom.xml" />
+        <option value="$PROJECT_DIR$/../gateway/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_19" default="true" project-jdk-name="19" project-jdk-type="JavaSDK" />

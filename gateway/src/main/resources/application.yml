@@ -3,14 +3,14 @@ spring:
     gateway:
       routes:
         - id: auth
-          uri: https://httpbin.org/
+          uri: http://localhost:8083/api/auth
           predicates:
-            - Path=/get
+            - Path=/api/auth/**
           filters:
             - name: Logging
               args:
                 baseMessage: My Custom Message
-                preLogger: true
+                authenticated: true
                 postLogger: true
 
 logging:

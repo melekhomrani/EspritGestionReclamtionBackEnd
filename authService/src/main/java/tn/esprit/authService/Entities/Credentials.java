@@ -28,6 +28,7 @@ public class Credentials implements UserDetails {
     private Long id;
     @Email
     private String email;
+    @JsonIgnore
     @NotBlank
     private String password;
     @Enumerated(EnumType.STRING)
@@ -40,6 +41,7 @@ public class Credentials implements UserDetails {
         return List.of(new SimpleGrantedAuthority(userRoles.name()));
     }
 
+    @JsonIgnore
     @Override
     public String getUsername() {
         return email;

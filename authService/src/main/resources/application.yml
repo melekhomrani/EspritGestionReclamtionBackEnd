@@ -11,5 +11,10 @@ spring:
       hibernate:
         format_sql: true
     database: oracle
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 server:
   port: 8083
