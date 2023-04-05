@@ -21,11 +21,13 @@ public class AuthController {
     private final AuthenticationService authenticationService;
     private final CredentialsRepository credentialsRepository;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest registerRequest){
-        var jwt = authenticationService.register(registerRequest);
-        return ResponseEntity.ok(jwt);
-    }
+//    @PostMapping("auth/first")
+//    public ResponseEntity<Boolean> register(@RequestBody NewUserReq newUserReq){
+//        var user = authenticationService.saveUserNoAuthCheck(newUserReq);
+//        log.info("saved user {}", user.get());
+//        if(user.isPresent()) return ResponseEntity.ok(true);
+//        return ResponseEntity.badRequest().build();
+//    }
 
     @PostMapping("/auth/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest loginRequest){
@@ -42,12 +44,6 @@ public class AuthController {
     @GetMapping
     public ResponseEntity<Credentials> getMe(Authentication authentication, HttpServletRequest req){
         Optional<Credentials> res = authenticationService.getMe(authentication);
-        log.info(req.getHeader("id"));
-        log.info(req.getHeader("email"));
-        log.info(req.getHeader("Authorization"));
-        if(res.isPresent()){
-            return ResponseEntity.ok(res.get());
-        }
-        return ResponseEntity.notFound().build();
+        return res.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

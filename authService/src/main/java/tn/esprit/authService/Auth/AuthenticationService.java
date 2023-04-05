@@ -2,6 +2,7 @@ package tn.esprit.authService.Auth;
 
 import com.rabbitmq.tools.json.JSONWriter;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationService {
     final CredentialsRepository credentialsRepository;
     final PasswordEncoder passwordEncoder;
@@ -29,7 +31,7 @@ public class AuthenticationService {
     final RabbitTemplate rabbitTemplate;
 
     public AuthenticationResponse register(RegisterRequest registerRequest) throws EntityNotFoundException {
-        try{
+        try {
             var user = Credentials.builder()
                     .email(registerRequest.getEmail())
                     .password(passwordEncoder.encode(registerRequest.getPassword()))
@@ -41,12 +43,12 @@ public class AuthenticationService {
             var jwt = jwtService.generateToken(user);
             return AuthenticationResponse.builder().token(jwt).build();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             throw e;
         }
     }
 
-    public AuthenticationResponse login(LoginRequest loginRequest){
+    public AuthenticationResponse login(LoginRequest loginRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -54,31 +56,47 @@ public class AuthenticationService {
                 )
         );
         var user = credentialsRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(()->new EntityNotFoundException("User Not Found"));
+                .orElseThrow(() -> new EntityNotFoundException("User Not Found"));
         var jwt = jwtService.generateToken(user);
         return AuthenticationResponse.builder().token(jwt).build();
     }
 
-    public Optional<Credentials> getMe(Authentication authentication){
+    public Optional<Credentials> getMe(Authentication authentication) {
         return credentialsRepository.findByEmail(authentication.getName());
     }
 
-    public Optional<Credentials> saveUser(Authentication authentication, NewUserReq newUserReq){
-        if(authentication.getAuthorities().contains(UserRoles.Admin)){
-            var user = Credentials.builder()
-                    .email(newUserReq.getEmail())
-                    .password(passwordEncoder.encode(newUserReq.getPassword()))
-                    .userRoles(UserRoles.User)
-                    .build();
-            var savedEntity = credentialsRepository.save(user);
-            rabbitTemplate.convertAndSend("", "q.new-user",NewUserMsg.builder()
-                    .newUserReq(newUserReq)
-                    .email(user.getEmail())
-                    .id(user.getId())
-            );
-            return Optional.of(savedEntity);
+    public Optional<Credentials> saveUser(Authentication authentication, NewUserReq newUserReq) {
+        if (authentication.getAuthorities().contains(UserRoles.Admin)) {
+            return getCredentials(newUserReq);
         }
         return Optional.empty();
+    }
+
+    public Optional<Credentials> saveUserNoAuthCheck(NewUserReq newUserReq) {
+        return getCredentials(newUserReq);
+    }
+
+    private Optional<Credentials> getCredentials(NewUserReq newUserReq) {
+        var user = Credentials.builder()
+                .email(newUserReq.getEmail())
+                .password(passwordEncoder.encode(newUserReq.getPassword()))
+                .userRoles(UserRoles.User)
+                .build();
+        var savedEntity = credentialsRepository.save(user);
+        rabbitTemplate.convertAndSend("", "q.new-user", NewUserMsg.builder()
+                .newUserReq(newUserReq)
+                .email(user.getEmail())
+                .id(user.getId())
+                .newUserReq(NewUserReq.builder()
+                        .email(user.getEmail())
+                        .firstName(newUserReq.getFirstName())
+                        .lastName(newUserReq.getLastName())
+                        .role(newUserReq.getRole())
+                        .build()
+                )
+                .build()
+        );
+        return Optional.of(savedEntity);
     }
 
 
