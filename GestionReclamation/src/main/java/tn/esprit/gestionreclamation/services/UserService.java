@@ -55,15 +55,22 @@ public class UserService {
         if (checkUser.isPresent()) {
             throw new AlreadyExistsException("Email address already exists");
         }
-        Role role = roleService.getRoleById(user.getRole());
-        Users newUser = Users.builder()
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .id(id)
-                .role(role)
-                .build();
-        return mapToUserResponse(userRepository.saveAndFlush(newUser));
+        try {
+            if(user.getRole() == null){
+                throw new EntityNotFoundException("UserService.saveUser: UserRequest Role Id cannot be null");
+            }
+            Role role = roleService.getRoleById(user.getRole());
+            Users newUser = Users.builder()
+                    .email(user.getEmail())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .id(id)
+                    .role(role)
+                    .build();
+            return mapToUserResponse(userRepository.saveAndFlush(newUser));
+        }catch (Exception e){
+            throw e;
+        }
     }
 
     public List<UserResponse> saveUsers(List<Users> users) {
@@ -114,5 +121,9 @@ public class UserService {
                 .dateCreation(user.getDateCreation())
                 .dateModification(user.getDateModification())
                 .build();
+    }
+
+    public List<Users> getAll(){
+        return userRepository.findAll();
     }
 }
