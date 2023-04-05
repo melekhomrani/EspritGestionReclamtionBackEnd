@@ -42,10 +42,11 @@ public class LoggingGatewayFilterFactory extends AbstractGatewayFilterFactory<Lo
 
             else {
                 var authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+                logger.info("Auth header is: {}", authHeader);
                 if(authHeader != null){
                     var client = HttpClient.newHttpClient();
                     var request = HttpRequest.newBuilder(
-                            URI.create("http://localhost:8083/api/auth"))
+                            URI.create("http://localhost:8083/api"))
                             .header("Authorization", authHeader)
                             .build();
                     try{
@@ -57,12 +58,13 @@ public class LoggingGatewayFilterFactory extends AbstractGatewayFilterFactory<Lo
                         exchange.getRequest().mutate().headers(h -> h.add("authorities", res.getUserRoles().toString()));
                         return chain.filter(exchange);
                     }catch (Exception e){
-                        logger.info("Error: " + e.getStackTrace());
+                        logger.info("Error: {}", e.getMessage());
                     }
                 }else{
                     logger.info("Not Executed");
                 }
             }
+            logger.info("skipped to default no authed response");
             exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
             return exchange.getResponse().setComplete();
 
