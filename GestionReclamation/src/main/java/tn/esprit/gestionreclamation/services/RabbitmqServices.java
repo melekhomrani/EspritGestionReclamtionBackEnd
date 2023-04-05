@@ -21,7 +21,7 @@ public class RabbitmqServices {
 
     @RabbitListener(queues = {"q.new-user"})
     public void onNewUser(NewUserMsg newUserMsg){
+        log.info("New user msg: {}, userReq: {}", newUserMsg, newUserMsg.getNewUserReq());
         userService.saveUser(newUserMsg.getNewUserReq(), newUserMsg.getId());
-
     }
 }
