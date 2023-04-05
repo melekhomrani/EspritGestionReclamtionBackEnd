@@ -27,6 +27,7 @@ public class Credentials implements UserDetails {
     @GeneratedValue
     private Long id;
     @Email
+    @Column(unique = true)
     private String email;
     @JsonIgnore
     @NotBlank
