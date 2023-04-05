@@ -17,6 +17,7 @@ public class ReclamationTypeController {
 
     private final ReclamationTypeService reclamationTypeService;
     private final UserService userService;
+    final Authentication authentication;
 
     @GetMapping
     public List<ReclamationType> getAllReclamationTypes() {
@@ -29,7 +30,7 @@ public class ReclamationTypeController {
     }
 
     @PostMapping
-    public ReclamationType saveReclamationType(@RequestBody ReclamationType reclamationType, Authentication authentication) {
+    public ReclamationType saveReclamationType(@RequestBody ReclamationType reclamationType) {
         if (userService.isAdmin(authentication)) {
             return reclamationTypeService.saveReclamationType(reclamationType);
         }
@@ -37,7 +38,7 @@ public class ReclamationTypeController {
     }
 
     @PutMapping("/{id}")
-    public ReclamationType updateReclamationType(@PathVariable Long id, @RequestBody ReclamationType reclamationType, Authentication authentication) {
+    public ReclamationType updateReclamationType(@PathVariable Long id, @RequestBody ReclamationType reclamationType) {
         if (userService.isAdmin(authentication)) {
             return reclamationTypeService.updateReclamationType(id, reclamationType);
         }
@@ -45,7 +46,7 @@ public class ReclamationTypeController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteReclamationType(@PathVariable Long id, Authentication authentication) {
+    public void deleteReclamationType(@PathVariable Long id) {
         if (userService.isAdmin(authentication)) {
             reclamationTypeService.deleteReclamationType(id);
         }
