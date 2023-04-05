@@ -3,13 +3,24 @@ spring:
     gateway:
       routes:
         - id: auth
-          uri: http://localhost:8083/api/auth
+          uri: http://localhost:8083
           predicates:
             - Path=/api/auth/**
           filters:
             - name: Logging
               args:
                 baseMessage: My Custom Message
+                authenticated: false
+                postLogger: true
+        - id: gestionReclam
+          uri: http://localhost:8085
+          predicates:
+            - Path=/gest/api/**
+          filters:
+            - StripPrefix=1
+            - name: Logging
+              args:
+                baseMessage: Accessed Gest service
                 authenticated: true
                 postLogger: true
 
