@@ -30,20 +30,11 @@ public class AccessFlowService {
     }
 
     public AccessFlow saveAccessFlow(AccessFlow accessFlow) {
-        Optional<AccessFlow> checkAccessFlow = accessFlowRepository.findById(accessFlow.getId());
+        Optional<AccessFlow> checkAccessFlow = accessFlowRepository.findByReclamationTypeId(accessFlow.getReclamationType().getId());
         if (checkAccessFlow.isPresent()) {
             throw new EntityNotFoundException("AccessFlow already exists");
         }
         //todo : naaresh bedhabet
-
-        AccessFlow accessFlowToSave = AccessFlow.builder()
-                .reclamationType(accessFlow.getReclamationType())
-                .approve(accessFlow.getApprove())
-                .consult(accessFlow.getConsult())
-                .create(accessFlow.getCreate())
-                .notify(accessFlow.getNotify())
-                .validate(accessFlow.getValidate())
-                .build();
         return accessFlowRepository.save(accessFlow);
     }
 
