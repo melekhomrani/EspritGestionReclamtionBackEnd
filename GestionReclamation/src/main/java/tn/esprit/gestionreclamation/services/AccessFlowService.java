@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tn.esprit.gestionreclamation.dto.AccessFlowRequest;
 import tn.esprit.gestionreclamation.models.AccessFlow;
+import tn.esprit.gestionreclamation.models.Reclamation;
+import tn.esprit.gestionreclamation.models.ReclamationType;
 import tn.esprit.gestionreclamation.models.Role;
 import tn.esprit.gestionreclamation.repositories.AccessFlowRepository;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +21,7 @@ public class AccessFlowService {
     private final AccessFlowRepository accessFlowRepository;
     private final ReclamationTypeService reclamationTypeService;
     private final RoleService roleService;
+    private final UserService userService;
 
     public List<AccessFlow> getAllAccessFlow() {
         return accessFlowRepository.findAll();
@@ -62,5 +66,61 @@ public class AccessFlowService {
 
     public void deleteAccessFlow(Long id) {
         accessFlowRepository.deleteById(id);
+    }
+
+    public List<Role> getAllowedToCreate(Long accessFlowId){
+        Optional<AccessFlow> accessFlow = accessFlowRepository.findById(accessFlowId);
+        if(accessFlow.isPresent()){
+            return accessFlow.get().getCreate();
+        }
+        throw new EntityNotFoundException("Not Found");
+    }
+
+    public List<Role> getAllowedToNotify(Long accessFlowId){
+        Optional<AccessFlow> accessFlow = accessFlowRepository.findById(accessFlowId);
+        if(accessFlow.isPresent()){
+            return accessFlow.get().getNotify();
+        }
+        throw new EntityNotFoundException("Not Found");
+    }
+
+    public List<Role> getAllowedToConsult(Long accessFlowId){
+        Optional<AccessFlow> accessFlow = accessFlowRepository.findById(accessFlowId);
+        if(accessFlow.isPresent()){
+            return accessFlow.get().getConsult();
+        }
+        throw new EntityNotFoundException("Not Found");
+    }
+
+    public List<Role> getAllowedToValidate(Long accessFlowId){
+        Optional<AccessFlow> accessFlow = accessFlowRepository.findById(accessFlowId);
+        if(accessFlow.isPresent()){
+            return accessFlow.get().getValidate();
+        }
+        throw new EntityNotFoundException("Not Found");
+    }
+
+    public List<Role> getAllowedToApprobate(Long accessFlowId){
+        Optional<AccessFlow> accessFlow = accessFlowRepository.findById(accessFlowId);
+        if(accessFlow.isPresent()){
+            return accessFlow.get().getApprove();
+        }
+        throw new EntityNotFoundException("Not Found");
+    }
+
+    public Optional<AccessFlow> getAccessFlowByReclamation(Reclamation reclamation){
+        return accessFlowRepository.findByReclamationTypeId(reclamation.getType().getId());
+    }
+
+    public List<ReclamationType> findAllowedTypes(Authentication authentication) throws AccessDeniedException {
+        var user = userService.getUserByUserName(authentication.getName());
+        if(user.isPresent()){
+            Role role = roleService.getRoleById(user.get().getRole().getId());
+            var accessFlowTab = accessFlowRepository.findAccessFlowsByCreateContaining(role);
+            List<ReclamationType> allowedTypes = List.of(null);
+            accessFlowTab.forEach((i)->allowedTypes.add(i.getReclamationType()));
+            return allowedTypes;
+        }
+        throw new AccessDeniedException("Not Authenticated");
     }
 }

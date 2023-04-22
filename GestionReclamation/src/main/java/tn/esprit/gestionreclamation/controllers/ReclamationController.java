@@ -8,10 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.gestionreclamation.models.Reclamation;
 import tn.esprit.gestionreclamation.models.ReclamationType;
-import tn.esprit.gestionreclamation.services.Authentication;
-import tn.esprit.gestionreclamation.services.ReclamationService;
-import tn.esprit.gestionreclamation.services.UserService;
+import tn.esprit.gestionreclamation.services.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
@@ -21,6 +20,7 @@ public class ReclamationController {
     final ReclamationService reclamationService;
     final Authentication authentication;
     final UserService userService;
+    final AccessFlowService accessFlowService;
 
     @GetMapping
     public ResponseEntity<List<Reclamation>> getAllReclamation(){
@@ -31,7 +31,7 @@ public class ReclamationController {
     }
 
     @GetMapping("/allowedTypes")
-    public ResponseEntity<List<ReclamationType>> getAllowedToCreate(){
-
+    public ResponseEntity<List<ReclamationType>> getAllowedToCreate() throws AccessDeniedException {
+        return ResponseEntity.ok(accessFlowService.findAllowedTypes(authentication));
     }
 }
