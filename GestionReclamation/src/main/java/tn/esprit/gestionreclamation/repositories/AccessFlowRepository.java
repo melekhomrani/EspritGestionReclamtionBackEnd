@@ -15,4 +15,12 @@ public interface AccessFlowRepository extends JpaRepository<AccessFlow, Long> {
 
     List<AccessFlow> findAccessFlowsByCreateContaining(Role role);
 
+    List<AccessFlow> findAccessFlowsByConsultContaining(Role role);
+
+    List<AccessFlow> findAccessFlowsByNotifyContaining(Role role);
+
+    List<AccessFlow> findAccessFlowsByApproveContaining(Role role);
+
+    List<AccessFlow> findAccessFlowsByValidateContaining(Role role);
+
 }

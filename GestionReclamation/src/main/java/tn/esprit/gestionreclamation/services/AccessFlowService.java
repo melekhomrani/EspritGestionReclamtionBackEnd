@@ -112,11 +112,59 @@ public class AccessFlowService {
         return accessFlowRepository.findByReclamationTypeId(reclamation.getType().getId());
     }
 
-    public List<ReclamationType> findAllowedTypes(Authentication authentication) throws AccessDeniedException {
+    public List<ReclamationType> findAllowedToCreateTypes(Authentication authentication) throws AccessDeniedException {
         var user = userService.getUserByUserName(authentication.getName());
         if(user.isPresent()){
             Role role = roleService.getRoleById(user.get().getRole().getId());
             var accessFlowTab = accessFlowRepository.findAccessFlowsByCreateContaining(role);
+            List<ReclamationType> allowedTypes = List.of(null);
+            accessFlowTab.forEach((i)->allowedTypes.add(i.getReclamationType()));
+            return allowedTypes;
+        }
+        throw new AccessDeniedException("Not Authenticated");
+    }
+
+    public List<ReclamationType> findAllowedToConsultTypes(Authentication authentication) throws AccessDeniedException {
+        var user = userService.getUserByUserName(authentication.getName());
+        if(user.isPresent()){
+            Role role = roleService.getRoleById(user.get().getRole().getId());
+            var accessFlowTab = accessFlowRepository.findAccessFlowsByConsultContaining(role);
+            List<ReclamationType> allowedTypes = List.of(null);
+            accessFlowTab.forEach((i)->allowedTypes.add(i.getReclamationType()));
+            return allowedTypes;
+        }
+        throw new AccessDeniedException("Not Authenticated");
+    }
+
+    public List<ReclamationType> findAllowedToNotifyTypes(Authentication authentication) throws AccessDeniedException {
+        var user = userService.getUserByUserName(authentication.getName());
+        if(user.isPresent()){
+            Role role = roleService.getRoleById(user.get().getRole().getId());
+            var accessFlowTab = accessFlowRepository.findAccessFlowsByNotifyContaining(role);
+            List<ReclamationType> allowedTypes = List.of(null);
+            accessFlowTab.forEach((i)->allowedTypes.add(i.getReclamationType()));
+            return allowedTypes;
+        }
+        throw new AccessDeniedException("Not Authenticated");
+    }
+
+    public List<ReclamationType> findAllowedToApproveTypes(Authentication authentication) throws AccessDeniedException {
+        var user = userService.getUserByUserName(authentication.getName());
+        if(user.isPresent()){
+            Role role = roleService.getRoleById(user.get().getRole().getId());
+            var accessFlowTab = accessFlowRepository.findAccessFlowsByApproveContaining(role);
+            List<ReclamationType> allowedTypes = List.of(null);
+            accessFlowTab.forEach((i)->allowedTypes.add(i.getReclamationType()));
+            return allowedTypes;
+        }
+        throw new AccessDeniedException("Not Authenticated");
+    }
+
+    public List<ReclamationType> findAllowedToValidateTypes(Authentication authentication) throws AccessDeniedException {
+        var user = userService.getUserByUserName(authentication.getName());
+        if(user.isPresent()){
+            Role role = roleService.getRoleById(user.get().getRole().getId());
+            var accessFlowTab = accessFlowRepository.findAccessFlowsByValidateContaining(role);
             List<ReclamationType> allowedTypes = List.of(null);
             accessFlowTab.forEach((i)->allowedTypes.add(i.getReclamationType()));
             return allowedTypes;
