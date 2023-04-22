@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import tn.esprit.gestionreclamation.models.Reclamation;
 import tn.esprit.gestionreclamation.repositories.ReclamationRepository;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,16 +15,22 @@ import java.util.Optional;
 public class ReclamationService {
 
     private final ReclamationRepository reclamationRepository;
+    private final AccessFlowService accessFlowService;
 
     public List<Reclamation> getAllReclamations() {
         return reclamationRepository.findAll();
+    }
+
+    public List<Reclamation> getAllAllowedReclamations(Authentication authentication) throws AccessDeniedException {
+        var allowedTypes = accessFlowService.findAllowedToConsultTypes(authentication);
+        return reclamationRepository.findAllByTypeIn(allowedTypes);
     }
 
     public Optional<Reclamation> getReclamationById(Long id) {
         return reclamationRepository.findById(id);
     }
 
-    public Reclamation saveReclamation(Reclamation reclamation) {
+    public Reclamation saveReclamation(Reclamation reclamation, Authentication authentication) throws AccessDeniedException {
         return reclamationRepository.saveAndFlush(reclamation);
     }
 
