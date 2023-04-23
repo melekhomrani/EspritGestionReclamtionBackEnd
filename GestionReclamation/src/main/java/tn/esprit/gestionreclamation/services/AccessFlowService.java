@@ -68,6 +68,12 @@ public class AccessFlowService {
         accessFlowRepository.deleteById(id);
     }
 
+    public AccessFlow getAccessFlowByTypeId(Long typeId){
+        var accessFlow = accessFlowRepository.findByReclamationTypeId(typeId);
+        if(accessFlow.isPresent()) return accessFlow.get();
+        throw new EntityNotFoundException("No Access flow with id: '" + typeId.toString() + "' found");
+    }
+
     public List<Role> getAllowedToCreate(Long accessFlowId){
         Optional<AccessFlow> accessFlow = accessFlowRepository.findById(accessFlowId);
         if(accessFlow.isPresent()){

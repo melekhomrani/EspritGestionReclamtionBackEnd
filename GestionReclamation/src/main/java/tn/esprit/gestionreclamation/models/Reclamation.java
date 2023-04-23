@@ -35,4 +35,6 @@ public class Reclamation {
     private LocalDateTime dateCreation;
     @UpdateTimestamp
     private LocalDateTime dateUpdate;
+    @Column()
+    private Boolean archived = false;
 }

@@ -3,6 +3,8 @@ package tn.esprit.gestionreclamation.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.gestionreclamation.dto.ReclamationRequest;
+import tn.esprit.gestionreclamation.dto.UpdateProgressRequest;
 import tn.esprit.gestionreclamation.exceptions.UserNotAuthorizedException;
 import tn.esprit.gestionreclamation.models.Reclamation;
 import tn.esprit.gestionreclamation.models.ReclamationType;
@@ -40,10 +42,46 @@ public class ReclamationController {
     public ResponseEntity<Reclamation> getReclamationById(@PathVariable Long id){
         Optional<Reclamation> reclamation = reclamationService.getReclamationById(id);
         if(reclamation.isPresent()){
-            if(userService.isAuthorized(authentication.getProfile().getRole(), accessFlowService.getAccessFlowByReclamation(reclamation.get()).get().getConsult())){
+            if(userService.isAuthorized(authentication.getProfile().getRole(), accessFlowService.getAccessFlowByReclamation(reclamation.get()).get().getConsult()) || userService.isAdmin(authentication)){
                 return ResponseEntity.ok(reclamation.get());
             }
         }
         throw new UserNotAuthorizedException("Not Authorized");
+    }
+
+    @PostMapping
+    public ResponseEntity<Reclamation> createReclamation(@RequestBody ReclamationRequest reclamationRequest) throws AccessDeniedException {
+        var user = authentication.getProfile();
+        var accessFlowTable = accessFlowService.getAccessFlowByTypeId(reclamationRequest.getTypeId());
+        if(userService.isAuthorized(user.getRole(), accessFlowTable.getCreate()) || user.getRole().getName().equalsIgnoreCase("Admin")){
+            var newReclamation = reclamationService.saveReclamation(reclamationRequest, authentication);
+            return ResponseEntity.ok(newReclamation);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @PutMapping("/progress/{id}")
+    public ResponseEntity<Reclamation> updateProgress(@PathVariable Long id, @RequestBody UpdateProgressRequest updateProgressRequest){
+        var updatedReclamation = reclamationService.updateProgress(id, authentication, updateProgressRequest);
+        if(updatedReclamation != null) return ResponseEntity.ok(updatedReclamation);
+        return ResponseEntity.badRequest().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> deleteReclamation(@PathVariable Long id){
+        if(userService.isAdmin(authentication)){
+            reclamationService.deleteReclamation(id);
+            return ResponseEntity.ok(true);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @PutMapping("/archive/{id}")
+    public ResponseEntity<Boolean> setToArchive(@PathVariable Long id){
+        if(userService.isAdmin(authentication)){
+            reclamationService.switchToArchive(id);
+            return ResponseEntity.ok(true);
+        }
+        return ResponseEntity.badRequest().build();
     }
 }
