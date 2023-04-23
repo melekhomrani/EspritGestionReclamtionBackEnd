@@ -3,6 +3,7 @@ package tn.esprit.gestionreclamation.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.gestionreclamation.dto.CalendarResponse;
 import tn.esprit.gestionreclamation.dto.ReclamationRequest;
 import tn.esprit.gestionreclamation.dto.UpdateProgressRequest;
 import tn.esprit.gestionreclamation.exceptions.UserNotAuthorizedException;
@@ -11,6 +12,9 @@ import tn.esprit.gestionreclamation.models.ReclamationType;
 import tn.esprit.gestionreclamation.services.*;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,5 +87,12 @@ public class ReclamationController {
             return ResponseEntity.ok(true);
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/calendar")
+    public ResponseEntity<ArrayList<CalendarResponse>> getCalendarData(@RequestParam String start, @RequestParam String end){
+        LocalDate newStart = LocalDate.parse(start, DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate newEnd = LocalDate.parse(end, DateTimeFormatter.ISO_LOCAL_DATE);
+        return ResponseEntity.ok(reclamationService.getCalendarData(newStart, newEnd));
     }
 }

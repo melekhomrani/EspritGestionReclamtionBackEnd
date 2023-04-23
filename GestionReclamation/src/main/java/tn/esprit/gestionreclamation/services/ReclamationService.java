@@ -3,6 +3,7 @@ package tn.esprit.gestionreclamation.services;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tn.esprit.gestionreclamation.dto.CalendarResponse;
 import tn.esprit.gestionreclamation.dto.ReclamationRequest;
 import tn.esprit.gestionreclamation.dto.UpdateProgressRequest;
 import tn.esprit.gestionreclamation.models.Progress;
@@ -10,6 +11,8 @@ import tn.esprit.gestionreclamation.models.Reclamation;
 import tn.esprit.gestionreclamation.repositories.ReclamationRepository;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -109,5 +112,19 @@ public class ReclamationService {
                 .orElseThrow(() -> new EntityNotFoundException("Reclamation not found"));
         reclamation.setArchived(!reclamation.getArchived());
         reclamationRepository.saveAndFlush(reclamation);
+    }
+
+    public ArrayList<CalendarResponse> getCalendarData(LocalDate start, LocalDate end) {
+        ArrayList<CalendarResponse> dailyCount = new ArrayList<CalendarResponse>();
+        start.datesUntil(end).forEach(
+                d-> {
+                    dailyCount.add(CalendarResponse.builder()
+                            .value(reclamationRepository.countAllByDateCreationBetween(d.atStartOfDay(), d.atStartOfDay().plusDays(1).minusSeconds(1)))
+                            .day(d)
+                            .build()
+                    );
+                }
+        );
+        return dailyCount;
     }
 }
