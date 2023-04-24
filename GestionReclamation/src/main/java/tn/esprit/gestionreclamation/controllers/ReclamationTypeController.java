@@ -29,7 +29,7 @@ public class ReclamationTypeController {
         return reclamationTypeService.getReclamationTypeById(id);
     }
 
-    @PostMapping
+    @PostMapping("/new")
     public ReclamationType saveReclamationType(@RequestBody ReclamationType reclamationType) {
         if (userService.isAdmin(authentication)) {
             return reclamationTypeService.saveReclamationType(reclamationType);

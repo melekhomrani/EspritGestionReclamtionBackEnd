@@ -62,16 +62,13 @@ public class UserController {
         throw new ForbiddenException("You are not authorized to perform this action");
     }
 
+    //No Post mapping here...
+    //Do not use  this please
+    //Only register users through auth microservice on port: 8083
+    //DO NOT USE - DANGER ! ! ! !
 //    @PostMapping
-//    public ResponseEntity<UserResponse> saveUser(@RequestBody UserRequest user) {
-//        try {
-//            if (userService.isAdmin(authentication)) {
-//                return ResponseEntity.status(HttpStatus.CREATED).body(userService.saveUser(user));
-//            }
-//            throw new ForbiddenException("You are not authorized to perform this action");
-//        } catch (Exception e) {
-//            throw new BadRequestException("Error while saving user");
-//        }
+//    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest){
+//
 //    }
 
     @PutMapping("/{id}")

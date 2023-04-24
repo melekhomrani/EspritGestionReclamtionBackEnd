@@ -50,6 +50,9 @@ public class UserService {
         return userRepository.findByEmail(user.getEmail());
     }
 
+
+    //This is only for saving users who were alrady registered through the auth service...
+    //Don't use this service directly please...
     public UserResponse saveUser(UserRequest user, Long id) {
         Optional<Users> checkUser = userRepository.findByEmail(user.getEmail());
         if (checkUser.isPresent()) {
@@ -73,9 +76,9 @@ public class UserService {
         }
     }
 
-    public List<UserResponse> saveUsers(List<Users> users) {
-        return userRepository.saveAllAndFlush(users).stream().map(this::mapToUserResponse).toList();
-    }
+//    public List<UserResponse> saveUsers(List<Users> users) {
+//        return userRepository.saveAllAndFlush(users).stream().map(this::mapToUserResponse).toList();
+//    }
 
     public UserResponse updateUser(Long id, UserRequest user) {
         Users userToUpdate = userRepository.findById(id)
