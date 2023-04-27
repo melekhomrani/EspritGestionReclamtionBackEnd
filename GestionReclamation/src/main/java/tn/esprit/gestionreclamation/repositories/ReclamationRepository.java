@@ -11,6 +11,6 @@ import java.util.List;
 
 @Repository
 public interface ReclamationRepository extends JpaRepository<Reclamation, Long> {
-    public List<Reclamation> findAllByTypeIn(List<ReclamationType> typeList);
-    public Integer countAllByDateCreationBetween(LocalDateTime start, LocalDateTime end);
+    List<Reclamation> findAllByTypeIn(List<ReclamationType> typeList);
+    Integer countAllByDateCreationBetween(LocalDateTime start, LocalDateTime end);
 }

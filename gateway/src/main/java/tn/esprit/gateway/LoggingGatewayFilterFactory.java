@@ -54,8 +54,8 @@ public class LoggingGatewayFilterFactory extends AbstractGatewayFilterFactory<Lo
                         logger.info(res.getEmail());
                         var req = exchange.getRequest();
                         exchange.getRequest().mutate().headers(h->h.add("id", res.getId().toString()));
-                        exchange.getRequest().mutate().headers(h->h.add("email", res.getEmail().toString()));
-                        exchange.getRequest().mutate().headers(h -> h.add("authorities", res.getUserRoles().toString()));
+                        exchange.getRequest().mutate().headers(h->h.add("email", res.getEmail()));
+                        exchange.getRequest().mutate().headers(h -> h.add("authorities", res.getUserRoles()));
                         return chain.filter(exchange);
                     }catch (Exception e){
                         logger.info("Error: {}", e.getMessage());
