@@ -50,25 +50,35 @@ public class UserService {
         return userRepository.findByEmail(user.getEmail());
     }
 
+
+    //This is only for saving users who were alrady registered through the auth service...
+    //Don't use this service directly please...
     public UserResponse saveUser(UserRequest user, Long id) {
         Optional<Users> checkUser = userRepository.findByEmail(user.getEmail());
         if (checkUser.isPresent()) {
             throw new AlreadyExistsException("Email address already exists");
         }
-        Role role = roleService.getRoleById(user.getRole());
-        Users newUser = Users.builder()
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .id(id)
-                .role(role)
-                .build();
-        return mapToUserResponse(userRepository.saveAndFlush(newUser));
+        try {
+            if(user.getRole() == null){
+                throw new EntityNotFoundException("UserService.saveUser: UserRequest Role Id cannot be null");
+            }
+            Role role = roleService.getRoleById(user.getRole());
+            Users newUser = Users.builder()
+                    .email(user.getEmail())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .id(id)
+                    .role(role)
+                    .build();
+            return mapToUserResponse(userRepository.saveAndFlush(newUser));
+        }catch (Exception e){
+            throw e;
+        }
     }
 
-    public List<UserResponse> saveUsers(List<Users> users) {
-        return userRepository.saveAllAndFlush(users).stream().map(this::mapToUserResponse).toList();
-    }
+//    public List<UserResponse> saveUsers(List<Users> users) {
+//        return userRepository.saveAllAndFlush(users).stream().map(this::mapToUserResponse).toList();
+//    }
 
     public UserResponse updateUser(Long id, UserRequest user) {
         Users userToUpdate = userRepository.findById(id)
@@ -97,7 +107,7 @@ public class UserService {
     }
 
     public Boolean isAdmin(Authentication authentication) {
-        return authentication.getProfile().getRole().toString().equals("Admin") || authentication.getAuthorities().equals("Admin");
+        return authentication.getProfile().getRole().toString().equalsIgnoreCase("Admin") || authentication.getAuthorities().equals("Admin");
     }
 
     public Boolean isAuthorized(Role role, List<Role> allowedRoles) {
@@ -114,5 +124,9 @@ public class UserService {
                 .dateCreation(user.getDateCreation())
                 .dateModification(user.getDateModification())
                 .build();
+    }
+
+    public List<Users> getAll(){
+        return userRepository.findAll();
     }
 }

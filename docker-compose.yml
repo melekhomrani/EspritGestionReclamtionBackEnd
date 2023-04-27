@@ -19,4 +19,4 @@ services:
       - 1523:1521
     container_name: oracledb
     volumes:
-      - /opt/oracle/oradataa
+      - /opt/oracle/oracledata

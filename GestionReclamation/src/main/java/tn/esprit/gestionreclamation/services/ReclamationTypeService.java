@@ -28,10 +28,10 @@ public class ReclamationTypeService {
 
     public ReclamationType saveReclamationType(ReclamationType reclamationType) {
         Optional<ReclamationType> reclamationTypeToSave = reclamationTypeRepository.findByTypeName(reclamationType.getTypeName());
-        if (reclamationTypeToSave.isPresent()) {
+        if (!reclamationTypeToSave.isEmpty()) {
             throw new AlreadyExistsException("ReclamationType already exists");
         }
-        return reclamationTypeRepository.save(reclamationTypeToSave.get());
+        return reclamationTypeRepository.save(reclamationType);
     }
 
     public List<ReclamationType> saveReclamationTypes(List<ReclamationType> reclamationTypes) {

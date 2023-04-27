@@ -8,11 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReclamationRequest {
+    private Long typeId;
     private String object;
     private String description;
-    private String type;
-    private String progress;
-    private String date;
-    private String author;
-
 }

@@ -16,9 +16,10 @@ import java.util.List;
 public class RoleController {
     private final RoleService roleService;
     private final UserService userService;
+    final Authentication authentication;
 
     @GetMapping
-    public List<Role> getAllRoles(Authentication authentication) {
+    public List<Role> getAllRoles() {
         if (userService.isAdmin(authentication)) {
             return roleService.getAllRoles();
         }
@@ -26,7 +27,7 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
-    public Role getRoleById(@PathVariable Long id, Authentication authentication) {
+    public Role getRoleById(@PathVariable Long id) {
         Role role = roleService.getRoleById(id);
         if (userService.isAdmin(authentication)) {
             return roleService.getRoleById(id);
@@ -35,7 +36,7 @@ public class RoleController {
     }
 
     @PostMapping
-    public Role saveRole(@RequestBody Role role, Authentication authentication) {
+    public Role saveRole(@RequestBody Role role) {
         if (userService.isAdmin(authentication)) {
             return roleService.saveRole(role);
         }
@@ -43,7 +44,7 @@ public class RoleController {
     }
 
     @PutMapping("/{id}")
-    public Role updateRole(@PathVariable Long id, @RequestBody Role role, Authentication authentication) {
+    public Role updateRole(@PathVariable Long id, @RequestBody Role role) {
         if (userService.isAdmin(authentication)) {
             return roleService.updateRole(id, role);
         }
@@ -51,7 +52,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteRole(@PathVariable Long id, Authentication authentication) {
+    public void deleteRole(@PathVariable Long id) {
         if (userService.isAdmin(authentication)) {
             roleService.deleteRole(id);
         }

@@ -1,0 +1,19 @@
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  mail:
+    host: us2.smtp.mailhostbox.com
+    port: 587
+    username: esprit@benahmed.tech
+    password: fGgoYH%8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+server:
+  port: 8020
