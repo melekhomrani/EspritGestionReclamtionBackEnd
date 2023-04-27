@@ -11,12 +11,16 @@
         <option value="$PROJECT_DIR$/../authService/pom.xml" />
         <option value="$PROJECT_DIR$/authService/pom.xml" />
         <option value="$PROJECT_DIR$/gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/../mailingService/pom.xml" />
+        <option value="$PROJECT_DIR$/mailingService/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/MessagingService/pom.xml" />
         <option value="$PROJECT_DIR$/../authService/pom.xml" />
         <option value="$PROJECT_DIR$/../gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/../mailingService/pom.xml" />
       </set>
     </option>
   </component>
