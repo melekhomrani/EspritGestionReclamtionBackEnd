@@ -177,10 +177,4 @@ public class AccessFlowService {
         }
         throw new AccessDeniedException("Not Authenticated");
     }
-
-    public void sendNotification(Reclamation newReclamation) {
-        AccessFlow accessFlow = getAccessFlowByReclamation(newReclamation).orElseThrow();
-        List<Role> toNotify = getAllowedToNotify(accessFlow.getId());
-
-    }
 }
