@@ -2,6 +2,7 @@ package tn.esprit.gestionreclamation.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tn.esprit.gestionreclamation.dto.CalendarResponse;
 import tn.esprit.gestionreclamation.dto.ReclamationRequest;
@@ -24,7 +25,8 @@ public class ReclamationService {
     private final AccessFlowService accessFlowService;
     private final ReclamationTypeService reclamationTypeService;
     private final UserService userService;
-
+    @Value("${FRONT_URL}")
+    private String frontUrl;
     public List<Reclamation> getAllReclamations() {
         return reclamationRepository.findAll();
     }
@@ -126,5 +128,9 @@ public class ReclamationService {
                 }
         );
         return dailyCount;
+    }
+
+    public String getFrontUrl(Long id){
+        return frontUrl + "/reclamation/" + id.toString();
     }
 }

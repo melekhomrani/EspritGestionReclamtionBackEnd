@@ -59,6 +59,7 @@ public class ReclamationController {
         var accessFlowTable = accessFlowService.getAccessFlowByTypeId(reclamationRequest.getTypeId());
         if(userService.isAuthorized(user.getRole(), accessFlowTable.getCreate()) || user.getRole().getName().equalsIgnoreCase("Admin")){
             var newReclamation = reclamationService.saveReclamation(reclamationRequest, authentication);
+            accessFlowService.sendNotification(newReclamation);
             return ResponseEntity.ok(newReclamation);
         }
         return ResponseEntity.badRequest().build();
