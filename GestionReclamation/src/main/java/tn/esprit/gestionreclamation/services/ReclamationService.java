@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import tn.esprit.gestionreclamation.dto.CalendarResponse;
 import tn.esprit.gestionreclamation.dto.ReclamationRequest;
 import tn.esprit.gestionreclamation.dto.UpdateProgressRequest;
+import tn.esprit.gestionreclamation.exceptions.BadRequestException;
 import tn.esprit.gestionreclamation.models.Progress;
 import tn.esprit.gestionreclamation.models.Reclamation;
 import tn.esprit.gestionreclamation.repositories.ReclamationRepository;
@@ -132,5 +133,25 @@ public class ReclamationService {
 
     public String getFrontUrl(Long id){
         return frontUrl + "/reclamation/" + id.toString();
+    }
+
+    public Integer getCountByUser(Authentication authentication){
+        return reclamationRepository.countAllByAuthor(authentication.getProfile());
+    }
+
+    public Integer getStateCountByUser(Authentication authentication, String state){
+        return switch (state.toLowerCase()) {
+            case "waiting" ->
+                    reclamationRepository.countAllByAuthorAndProgress(authentication.getProfile(), Progress.WAITING);
+            case "processing" ->
+                    reclamationRepository.countAllByAuthorAndProgress(authentication.getProfile(), Progress.PROCESSING);
+            case "validated" ->
+                    reclamationRepository.countAllByAuthorAndProgress(authentication.getProfile(), Progress.VALIDATED);
+            case "done" ->
+                    reclamationRepository.countAllByAuthorAndProgress(authentication.getProfile(), Progress.DONE);
+            case "cancelled" ->
+                    reclamationRepository.countAllByAuthorAndProgress(authentication.getProfile(), Progress.CANCELLED);
+            default -> throw new BadRequestException("Invalid State");
+        };
     }
 }

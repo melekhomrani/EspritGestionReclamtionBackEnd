@@ -1,5 +1,6 @@
 package tn.esprit.gestionreclamation.controllers;
 
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -95,5 +96,15 @@ public class ReclamationController {
         LocalDate newStart = LocalDate.parse(start, DateTimeFormatter.ISO_LOCAL_DATE);
         LocalDate newEnd = LocalDate.parse(end, DateTimeFormatter.ISO_LOCAL_DATE);
         return ResponseEntity.ok(reclamationService.getCalendarData(newStart, newEnd));
+    }
+
+    @GetMapping
+    @RequestMapping(value = {"/count", "/count/{state}"})
+    public ResponseEntity<Integer> getCountByState(@PathVariable(required = false) String state){
+        if(state==null || "".equalsIgnoreCase(state)){
+            return ResponseEntity.ok(reclamationService.getCountByUser(authentication));
+        } else {
+            return ResponseEntity.ok(reclamationService.getStateCountByUser(authentication, state));
+        }
     }
 }
