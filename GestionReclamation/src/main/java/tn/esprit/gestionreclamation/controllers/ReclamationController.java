@@ -98,8 +98,7 @@ public class ReclamationController {
         return ResponseEntity.ok(reclamationService.getCalendarData(newStart, newEnd));
     }
 
-    @GetMapping
-    @RequestMapping(value = {"/count", "/count/{state}"})
+    @GetMapping(value = {"/count", "/count/{state}"})
     public ResponseEntity<Integer> getCountByState(@PathVariable(required = false) String state){
         if(state==null || "".equalsIgnoreCase(state)){
             return ResponseEntity.ok(reclamationService.getCountByUser(authentication));
