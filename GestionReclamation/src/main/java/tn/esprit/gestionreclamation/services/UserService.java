@@ -107,7 +107,7 @@ public class UserService {
     }
 
     public Boolean isAdmin(Authentication authentication) {
-        return authentication.getProfile().getRole().toString().equalsIgnoreCase("Admin") || authentication.getAuthorities().equals("Admin");
+        return authentication.getProfile().getRole().getName().equalsIgnoreCase("Admin");
     }
 
     public Boolean isAuthorized(Role role, List<Role> allowedRoles) {

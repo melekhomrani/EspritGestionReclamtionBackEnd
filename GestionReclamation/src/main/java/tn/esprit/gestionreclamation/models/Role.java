@@ -23,9 +23,6 @@ public class Role {
     private Long id;
     @Column(unique = true)
     private String name;
-    @JsonIgnore
-    @OneToMany(mappedBy = "role")
-    private List<Users> users;
     @CreationTimestamp
     private LocalDateTime dateCreation;
     @UpdateTimestamp

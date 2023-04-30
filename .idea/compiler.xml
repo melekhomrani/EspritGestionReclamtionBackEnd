@@ -11,11 +11,9 @@
         <module name="mailingService" />
         <module name="authService" />
         <module name="gateway" />
+        <module name="MessagingService" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="MessagingService" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

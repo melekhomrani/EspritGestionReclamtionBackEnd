@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../GestionReclamtionBackEnd.iml" filepath="$PROJECT_DIR$/../GestionReclamtionBackEnd.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MessagingService/MessagingService.iml" filepath="$PROJECT_DIR$/MessagingService/MessagingService.iml" />
     </modules>
   </component>
 </project>

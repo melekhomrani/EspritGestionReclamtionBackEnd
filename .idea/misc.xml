@@ -7,8 +7,6 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/MessagingService/pom.xml" />
         <option value="$PROJECT_DIR$/GestionReclamation/pom.xml" />
-        <option value="$PROJECT_DIR$/../gateway/pom.xml" />
-        <option value="$PROJECT_DIR$/../authService/pom.xml" />
         <option value="$PROJECT_DIR$/authService/pom.xml" />
         <option value="$PROJECT_DIR$/gateway/pom.xml" />
         <option value="$PROJECT_DIR$/../mailingService/pom.xml" />
