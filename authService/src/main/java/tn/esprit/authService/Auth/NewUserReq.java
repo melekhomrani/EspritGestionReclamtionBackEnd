@@ -15,4 +15,5 @@ public class NewUserReq {
     private String lastName;
     private String password;
     private Long role;
+    private Boolean isAdmin;
 }

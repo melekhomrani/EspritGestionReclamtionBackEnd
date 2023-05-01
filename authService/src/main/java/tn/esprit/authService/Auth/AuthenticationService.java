@@ -82,6 +82,7 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(newUserReq.getPassword()))
                 .userRoles(UserRoles.User)
                 .build();
+        if(newUserReq.getIsAdmin()) user.setUserRoles(UserRoles.Admin);
         var savedEntity = credentialsRepository.save(user);
         rabbitTemplate.convertAndSend("", "q.new-user", NewUserMsg.builder()
                 .newUserReq(newUserReq)
