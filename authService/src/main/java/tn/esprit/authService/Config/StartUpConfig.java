@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import tn.esprit.authService.Auth.AuthenticationService;
 import tn.esprit.authService.Auth.NewUserReq;
 import tn.esprit.authService.Entities.Credentials;
+import tn.esprit.authService.Entities.UserRoles;
 import tn.esprit.authService.Repositories.CredentialsRepository;
 
 @Configuration
@@ -22,6 +23,9 @@ public class StartUpConfig {
           if(!checkIfUserExists.isPresent()){
               var admin = NewUserReq.builder().email("abc@abc.com").firstName("test").lastName("user").role(Long.valueOf(1)).password("12345").build();
               var saved = authenticationService.saveUserNoAuthCheck(admin);
+              var user = saved.get();
+              user.setUserRoles(UserRoles.Admin);
+              credentialsRepository.saveAndFlush(user);
               log.info("registered primary user: {}", saved.get());
           } else {
               log.info("primary User abc@abc.com already exists");
