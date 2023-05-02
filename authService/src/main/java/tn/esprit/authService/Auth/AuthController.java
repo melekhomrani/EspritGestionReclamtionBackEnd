@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationService authenticationService;
@@ -29,21 +29,31 @@ public class AuthController {
 //        return ResponseEntity.badRequest().build();
 //    }
 
-    @PostMapping("/auth/login")
+    @PostMapping("/api/auth/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest loginRequest){
         return ResponseEntity.ok(authenticationService.login(loginRequest));
     }
 
-    @PostMapping("/auth/register")
-    public ResponseEntity registerNewUser(Authentication authentication ,@RequestBody NewUserReq newUserReq){
+    @PostMapping("/api/auth/register")
+    public ResponseEntity<Credentials> registerNewUser(Authentication authentication ,@RequestBody NewUserReq newUserReq){
         var user = authenticationService.saveUser(authentication, newUserReq);
-        if(user.isPresent()) return ResponseEntity.ok(user.get());
-        return ResponseEntity.badRequest().build();
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.badRequest().build());
+    }
+
+    @PostMapping("/internal/auth/register")
+    public ResponseEntity<Credentials> internalRegister(Authentication authentication ,@RequestBody NewUserReq newUserReq){
+        var user = authenticationService.saveUserNoAuthCheck(newUserReq);
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @GetMapping
     public ResponseEntity<Credentials> getMe(Authentication authentication, HttpServletRequest req){
         Optional<Credentials> res = authenticationService.getMe(authentication);
         return res.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/internal/test")
+    public Boolean testInternal(){
+        return true;
     }
 }

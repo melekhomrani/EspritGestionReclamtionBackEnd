@@ -4,15 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tn.esprit.gestionreclamation.models.Users;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class UserRequest {
+public class AuthResponse {
+    private Long id;
     private String email;
-    private String firstName;
-    private String lastName;
-    private Long role;
 }

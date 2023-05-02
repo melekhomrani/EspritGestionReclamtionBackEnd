@@ -18,3 +18,5 @@ spring:
     password: guest
 server:
   port: 8083
+  trustedPort: 8005
+  trustedPathPrefix: /internal/
