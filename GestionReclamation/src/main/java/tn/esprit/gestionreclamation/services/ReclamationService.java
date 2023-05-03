@@ -3,6 +3,7 @@ package tn.esprit.gestionreclamation.services;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tn.esprit.gestionreclamation.dto.CalendarResponse;
 import tn.esprit.gestionreclamation.dto.ReclamationRequest;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @Service
@@ -117,7 +119,8 @@ public class ReclamationService {
         reclamationRepository.saveAndFlush(reclamation);
     }
 
-    public ArrayList<CalendarResponse> getCalendarData(LocalDate start, LocalDate end) {
+    @Async
+    public CompletableFuture<ArrayList<CalendarResponse>> getCalendarData(LocalDate start, LocalDate end) {
         ArrayList<CalendarResponse> dailyCount = new ArrayList<CalendarResponse>();
         start.datesUntil(end).forEach(
                 d-> {
@@ -128,19 +131,21 @@ public class ReclamationService {
                     );
                 }
         );
-        return dailyCount;
+        return CompletableFuture.completedFuture(dailyCount);
     }
 
     public String getFrontUrl(Long id){
         return frontUrl + "/reclamation/" + id.toString();
     }
 
-    public Integer getCountByUser(Authentication authentication){
-        return reclamationRepository.countAllByAuthor(authentication.getProfile());
+    @Async
+    public CompletableFuture<Integer> getCountByUser(Authentication authentication){
+        return CompletableFuture.completedFuture(reclamationRepository.countAllByAuthor(authentication.getProfile()));
     }
 
-    public Integer getStateCountByUser(Authentication authentication, String state){
-        return switch (state.toLowerCase()) {
+    @Async
+    public CompletableFuture<Integer> getStateCountByUser(Authentication authentication, String state){
+        return CompletableFuture.completedFuture(switch (state.toLowerCase()) {
             case "waiting" ->
                     reclamationRepository.countAllByAuthorAndProgress(authentication.getProfile(), Progress.WAITING);
             case "processing" ->
@@ -152,6 +157,7 @@ public class ReclamationService {
             case "cancelled" ->
                     reclamationRepository.countAllByAuthorAndProgress(authentication.getProfile(), Progress.CANCELLED);
             default -> throw new BadRequestException("Invalid State");
-        };
+        });
+
     }
 }

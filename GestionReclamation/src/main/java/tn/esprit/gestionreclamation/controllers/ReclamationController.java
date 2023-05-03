@@ -1,12 +1,13 @@
 package tn.esprit.gestionreclamation.controllers;
 
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.gestionreclamation.dto.CalendarResponse;
 import tn.esprit.gestionreclamation.dto.ReclamationRequest;
 import tn.esprit.gestionreclamation.dto.UpdateProgressRequest;
+import tn.esprit.gestionreclamation.dto.rabbitmqEvents.EmailDetailsAsync;
 import tn.esprit.gestionreclamation.exceptions.UserNotAuthorizedException;
 import tn.esprit.gestionreclamation.models.Reclamation;
 import tn.esprit.gestionreclamation.models.ReclamationType;
@@ -18,6 +19,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/reclamation")
@@ -27,6 +30,9 @@ public class ReclamationController {
     final Authentication authentication;
     final UserService userService;
     final AccessFlowService accessFlowService;
+    final NotificationService notificationService;
+    @Value("${FRONT_URL}")
+    private String frontUrl;
 
     @GetMapping
     public ResponseEntity<List<Reclamation>> getAllReclamation(){
@@ -60,7 +66,26 @@ public class ReclamationController {
         var accessFlowTable = accessFlowService.getAccessFlowByTypeId(reclamationRequest.getTypeId());
         if(userService.isAuthorized(user.getRole(), accessFlowTable.getCreate()) || user.getRole().getName().equalsIgnoreCase("Admin")){
             var newReclamation = reclamationService.saveReclamation(reclamationRequest, authentication);
-            accessFlowService.sendNotification(newReclamation);
+            notificationService.notifyList(accessFlowTable.getNotify(), EmailDetailsAsync.builder()
+                    .action("Creer")
+                    .subject("Esprit CRM Notification:")
+                    .actionDoer(authentication.getProfile())
+                    .withButton(true)
+                    .buttonLink(frontUrl+"/reclamation/"+newReclamation.getId())
+                    .buttonText("Clickez Ici Pour Consulter")
+                    .recipient(authentication.getProfile())
+                    .build()
+            );
+            notificationService.notifyList(accessFlowTable.getApprove(), EmailDetailsAsync.builder()
+                    .action("Creer")
+                    .subject("Esprit CRM Notification:")
+                    .actionDoer(authentication.getProfile())
+                    .withButton(true)
+                    .buttonLink(frontUrl+"/reclamation/"+newReclamation.getId())
+                    .buttonText("Clickez Ici Pour Consulter")
+                    .recipient(authentication.getProfile())
+                    .build()
+            );
             return ResponseEntity.ok(newReclamation);
         }
         return ResponseEntity.badRequest().build();
@@ -70,6 +95,16 @@ public class ReclamationController {
     public ResponseEntity<Reclamation> updateProgress(@PathVariable Long id, @RequestBody UpdateProgressRequest updateProgressRequest){
         var updatedReclamation = reclamationService.updateProgress(id, authentication, updateProgressRequest);
         if(updatedReclamation != null) return ResponseEntity.ok(updatedReclamation);
+        notificationService.getListsAndNotify(updatedReclamation, EmailDetailsAsync.builder()
+                .action("Modifier l'etat")
+                .actionDoer(authentication.getProfile())
+                .subject("Esprit CRM Notification")
+                .withButton(true)
+                .buttonLink(frontUrl+"/reclamation/"+ updatedReclamation.getId())
+                .buttonText("Consulter Ici")
+                .recipient(authentication.getProfile())
+                .build()
+        );
         return ResponseEntity.badRequest().build();
     }
 
@@ -92,18 +127,19 @@ public class ReclamationController {
     }
 
     @GetMapping("/calendar")
-    public ResponseEntity<ArrayList<CalendarResponse>> getCalendarData(@RequestParam String start, @RequestParam String end){
+    public ResponseEntity<ArrayList<CalendarResponse>> getCalendarData(@RequestParam String start, @RequestParam String end) throws ExecutionException, InterruptedException {
         LocalDate newStart = LocalDate.parse(start, DateTimeFormatter.ISO_LOCAL_DATE);
         LocalDate newEnd = LocalDate.parse(end, DateTimeFormatter.ISO_LOCAL_DATE);
-        return ResponseEntity.ok(reclamationService.getCalendarData(newStart, newEnd));
+        var res = reclamationService.getCalendarData(newStart, newEnd);
+        return ResponseEntity.ok(res.get());
     }
 
     @GetMapping(value = {"/count", "/count/{state}"})
-    public ResponseEntity<Integer> getCountByState(@PathVariable(required = false) String state){
+    public ResponseEntity<Integer> getCountByState(@PathVariable(required = false) String state) throws ExecutionException, InterruptedException {
         if(state==null || "".equalsIgnoreCase(state)){
-            return ResponseEntity.ok(reclamationService.getCountByUser(authentication));
+            return ResponseEntity.ok(reclamationService.getCountByUser(authentication).get());
         } else {
-            return ResponseEntity.ok(reclamationService.getStateCountByUser(authentication, state));
+            return ResponseEntity.ok(reclamationService.getStateCountByUser(authentication, state).get());
         }
     }
 }
