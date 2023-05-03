@@ -66,10 +66,7 @@ public class AuthenticationService {
     }
 
     public Optional<Credentials> saveUser(Authentication authentication, NewUserReq newUserReq) {
-        if (authentication.getAuthorities().contains(UserRoles.Admin)) {
             return getCredentials(newUserReq);
-        }
-        return Optional.empty();
     }
 
     public Optional<Credentials> saveUserNoAuthCheck(NewUserReq newUserReq) {
