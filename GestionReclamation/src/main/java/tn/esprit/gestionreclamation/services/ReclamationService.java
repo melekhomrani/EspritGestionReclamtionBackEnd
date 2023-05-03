@@ -47,6 +47,7 @@ public class ReclamationService {
         return reclamationRepository.saveAndFlush(Reclamation.builder()
                 .author(authentication.getProfile())
                 .subject(reclamation.getObject())
+                .progress(Progress.WAITING)
                 .type(reclamationTypeService.getReclamationTypeById(reclamation.getTypeId()))
                 .description(reclamation.getDescription())
                 .build()
