@@ -25,6 +25,7 @@ import tn.esprit.gestionreclamation.repositories.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -145,13 +146,13 @@ public class UserService {
     }
 
     public UserResponse createNewUser(NewUserReq newUserReq){
-        ResponseEntity<AuthResponse> authResponse = restTemplate.postForEntity(frontUrl+"/internal/auth/register", newUserReq, AuthResponse.class);
+        ResponseEntity<AuthResponse> authResponse = restTemplate.postForEntity("http://localhost:8083/internal/auth/register", newUserReq, AuthResponse.class);
         if(authResponse.getStatusCode() != HttpStatus.OK) throw new BadRequestException("Something Went Wrong");
         return saveUser(UserRequest.builder()
                 .firstName(newUserReq.getFirstName())
                 .lastName(newUserReq.getLastName())
                 .role(newUserReq.getRole())
-                .email(authResponse.getBody().getEmail())
+                .email(Objects.requireNonNull(authResponse.getBody()).getEmail())
                 .build(),
                 authResponse.getBody().getId()
         );
