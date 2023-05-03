@@ -73,7 +73,7 @@ public class AuthenticationService {
     }
 
     public Optional<Credentials> saveUserNoAuthCheck(NewUserReq newUserReq) {
-        return getCredentialsNoRabbit(newUserReq);
+        return getCredentials(newUserReq);
     }
 
     private Optional<Credentials> getCredentials(NewUserReq newUserReq) {
@@ -99,19 +99,6 @@ public class AuthenticationService {
                 )
                 .build()
         );
-        return Optional.of(savedEntity);
-    }
-
-    private Optional<Credentials> getCredentialsNoRabbit(NewUserReq newUserReq) {
-        var user = Credentials.builder()
-                .email(newUserReq.getEmail())
-                .password(passwordEncoder.encode(newUserReq.getPassword()))
-                .userRoles(UserRoles.User)
-                .build();
-        if(newUserReq.getIsAdmin() != null){
-            if(newUserReq.getIsAdmin()) user.setUserRoles(UserRoles.Admin);
-        }
-        var savedEntity = credentialsRepository.save(user);
         return Optional.of(savedEntity);
     }
 

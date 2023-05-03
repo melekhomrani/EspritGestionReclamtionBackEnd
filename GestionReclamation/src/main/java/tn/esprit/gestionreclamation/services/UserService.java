@@ -5,19 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import tn.esprit.gestionreclamation.dto.AuthResponse;
-import tn.esprit.gestionreclamation.dto.NewUserReq;
 import tn.esprit.gestionreclamation.dto.UserRequest;
 import tn.esprit.gestionreclamation.dto.UserResponse;
 import tn.esprit.gestionreclamation.dto.rabbitmqEvents.UpdateEmailMsg;
 import tn.esprit.gestionreclamation.dto.rabbitmqEvents.UpdatePassword;
 import tn.esprit.gestionreclamation.exceptions.AlreadyExistsException;
-import tn.esprit.gestionreclamation.exceptions.BadRequestException;
 import tn.esprit.gestionreclamation.models.Role;
 import tn.esprit.gestionreclamation.models.Users;
 import tn.esprit.gestionreclamation.repositories.UserRepository;
@@ -34,9 +27,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final RabbitTemplate rabbitTemplate;
-    private RestTemplate restTemplate;
-    @Value("${FRONT_URL:http://localhost8005}")
-    private String frontUrl;
 
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream().map(this::mapToUserResponse).toList();
@@ -142,18 +132,5 @@ public class UserService {
 
     public List<Users> getAllByRole(Role role){
         return userRepository.findAllByRole(role);
-    }
-
-    public UserResponse createNewUser(NewUserReq newUserReq){
-        ResponseEntity<AuthResponse> authResponse = restTemplate.postForEntity(frontUrl+"/internal/auth/register", newUserReq, AuthResponse.class);
-        if(authResponse.getStatusCode() != HttpStatus.OK) throw new BadRequestException("Something Went Wrong");
-        return saveUser(UserRequest.builder()
-                .firstName(newUserReq.getFirstName())
-                .lastName(newUserReq.getLastName())
-                .role(newUserReq.getRole())
-                .email(authResponse.getBody().getEmail())
-                .build(),
-                authResponse.getBody().getId()
-        );
     }
 }

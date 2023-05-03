@@ -19,4 +19,3 @@ spring:
 server:
   port: 8085
 FRONT_URL: localhost:3000
-AUTH_URL: http://localhost8005
