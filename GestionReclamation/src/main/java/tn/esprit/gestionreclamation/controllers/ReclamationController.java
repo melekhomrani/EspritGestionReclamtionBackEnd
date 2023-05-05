@@ -64,7 +64,7 @@ public class ReclamationController {
     public ResponseEntity<Reclamation> createReclamation(@RequestBody ReclamationRequest reclamationRequest) throws AccessDeniedException {
         var user = authentication.getProfile();
         var accessFlowTable = accessFlowService.getAccessFlowByTypeId(reclamationRequest.getTypeId());
-        if(userService.isAuthorized(user.getRole(), accessFlowTable.getCreate()) || user.getRole().getName().equalsIgnoreCase("Admin")){
+        if(userService.isAuthorized(user.getRole(), accessFlowTable.getCreate()) || userService.isAdmin(authentication)){
             var newReclamation = reclamationService.saveReclamation(reclamationRequest, authentication);
             notificationService.notifyList(accessFlowTable.getNotify(), EmailDetailsAsync.builder()
                     .action("Creer")
