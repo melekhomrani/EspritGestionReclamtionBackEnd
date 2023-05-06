@@ -21,7 +21,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/gest/users")
 public class UserController {
     private final UserService userService;
     final Authentication authentication;
@@ -75,6 +75,7 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest user) {
         if (userService.isAdmin(authentication)) {
             try {
+                log.info("User object: {}", user);
                 return ResponseEntity.ok(userService.updateUser(id, user));
             } catch (Exception e) {
                 throw new BadRequestException("Error while updating user");

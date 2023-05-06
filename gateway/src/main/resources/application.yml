@@ -15,9 +15,8 @@ spring:
         - id: gestionReclam
           uri: http://localhost:8085
           predicates:
-            - Path=/gest/api/**
+            - Path=/api/gest/**
           filters:
-            - StripPrefix=1
             - name: Logging
               args:
                 baseMessage: Accessed Gest service

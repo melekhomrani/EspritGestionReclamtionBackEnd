@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @RestController
-@RequestMapping("/api/reclamation")
+@RequestMapping("/api/gest/reclamations")
 @RequiredArgsConstructor
 public class ReclamationController {
     final ReclamationService reclamationService;
@@ -71,7 +71,7 @@ public class ReclamationController {
                     .subject("Esprit CRM Notification:")
                     .actionDoer(authentication.getProfile())
                     .withButton(true)
-                    .buttonLink(frontUrl+"/reclamation/"+newReclamation.getId())
+                    .buttonLink(frontUrl+"/reclamations/"+newReclamation.getId())
                     .buttonText("Clickez Ici Pour Consulter")
                     .recipient(authentication.getProfile())
                     .build()

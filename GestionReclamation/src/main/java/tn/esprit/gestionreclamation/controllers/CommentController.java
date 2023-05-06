@@ -11,7 +11,7 @@ import tn.esprit.gestionreclamation.services.CommentService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/api/gest/comments")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;

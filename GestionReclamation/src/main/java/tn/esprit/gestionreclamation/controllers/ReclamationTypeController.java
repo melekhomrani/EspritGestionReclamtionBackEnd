@@ -12,7 +12,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/reclamationTypes")
+@RequestMapping("/api/gest/reclamationTypes")
 public class ReclamationTypeController {
 
     private final ReclamationTypeService reclamationTypeService;
