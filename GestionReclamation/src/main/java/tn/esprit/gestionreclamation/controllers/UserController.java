@@ -1,6 +1,6 @@
 package tn.esprit.gestionreclamation.controllers;
 
-
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +16,7 @@ import tn.esprit.gestionreclamation.services.Authentication;
 import tn.esprit.gestionreclamation.services.UserService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -106,11 +107,16 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteUser(@PathVariable Long id) {
+        try {
             if (userService.isAdmin(authentication)) {
                 userService.deleteUser(id);
                 return ResponseEntity.ok(true);
             }
             throw new UserNotAuthorizedException("You are not authorized to delete a user");
+
+        } catch (Exception e) {
+            throw new BadRequestException("Error while deleting user");
+        }
     }
 
 }
