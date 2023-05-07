@@ -2,6 +2,7 @@ package tn.esprit.gestionreclamation.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.gestionreclamation.dto.ReclamationTypeRequest;
 import tn.esprit.gestionreclamation.exceptions.ForbiddenException;
 import tn.esprit.gestionreclamation.models.ReclamationType;
 import tn.esprit.gestionreclamation.services.Authentication;
@@ -27,6 +28,14 @@ public class ReclamationTypeController {
     @GetMapping("/{id}")
     public ReclamationType getReclamationTypeById(@PathVariable Long id) {
         return reclamationTypeService.getReclamationTypeById(id);
+    }
+
+    @PostMapping
+    public ReclamationType saveWithAccessFlow(@RequestBody ReclamationTypeRequest reclamationTypeRequest){
+        if(userService.isAdmin(authentication)){
+            return reclamationTypeService.saveWithAccessFlow(reclamationTypeRequest);
+        }
+        throw new ForbiddenException("You are not authorized to perform this action");
     }
 
     @PostMapping("/new")
