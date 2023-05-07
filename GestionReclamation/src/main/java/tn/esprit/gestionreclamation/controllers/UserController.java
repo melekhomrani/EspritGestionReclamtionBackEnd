@@ -34,6 +34,14 @@ public class UserController {
         throw new ForbiddenException("You are not authorized to perform this action");
     }
 
+    @GetMapping("/isadmin")
+    public ResponseEntity<Boolean> isAdmin() {
+        log.info("##############################################################" +
+                "uthentication object: {}" +
+                "###########################################################", authentication);
+        return ResponseEntity.ok(userService.isAdmin(authentication));
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getMe() {
         log.info("Authentication object: {}", authentication);
