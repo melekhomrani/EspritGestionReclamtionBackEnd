@@ -107,16 +107,11 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteUser(@PathVariable Long id) {
-        try {
             if (userService.isAdmin(authentication)) {
                 userService.deleteUser(id);
                 return ResponseEntity.ok(true);
             }
             throw new UserNotAuthorizedException("You are not authorized to delete a user");
-
-        } catch (Exception e) {
-            throw new BadRequestException("Error while deleting user");
-        }
     }
 
 }
