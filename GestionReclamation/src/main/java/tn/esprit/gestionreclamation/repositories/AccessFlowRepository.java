@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface AccessFlowRepository extends JpaRepository<AccessFlow, Long> {
     Optional<AccessFlow> findById(Long id);
     Optional<AccessFlow> findByReclamationTypeId(Long id);
-
+    List<AccessFlow> findAccessFlowsByReclamationTypeId(Long id);
     List<AccessFlow> findAccessFlowsByCreateContaining(Role role);
 
     List<AccessFlow> findAccessFlowsByConsultContaining(Role role);

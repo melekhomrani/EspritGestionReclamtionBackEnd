@@ -1,6 +1,7 @@
 package tn.esprit.gestionreclamation.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.gestionreclamation.dto.ReclamationTypeRequest;
 import tn.esprit.gestionreclamation.exceptions.ForbiddenException;
@@ -57,10 +58,11 @@ public class ReclamationTypeController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteReclamationType(@PathVariable Long id) {
+    public ResponseEntity<Boolean> deleteReclamationType(@PathVariable Long id) {
         if (userService.isAdmin(authentication)) {
+            accessFlowService.deleteAccessFlowsByReclamationTypeId(id);
             reclamationTypeService.deleteReclamationType(id);
-            accessFlowService.deleteAccessFlow(accessFlowService.getAccessFlowByTypeId(id).getId());
+            return ResponseEntity.ok(true);
         }
         throw new ForbiddenException("You are not authorized to perform this action");
     }
