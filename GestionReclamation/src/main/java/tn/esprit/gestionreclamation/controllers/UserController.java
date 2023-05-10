@@ -21,6 +21,10 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@CrossOrigin(origins = "http://localhost:5173",
+        methods = { RequestMethod.POST, RequestMethod.DELETE, RequestMethod.GET, RequestMethod.PUT,  },
+        allowedHeaders = { "Content-Type", "Authorization" }
+)
 @RequestMapping("/api/gest/users")
 public class UserController {
     private final UserService userService;
@@ -82,12 +86,11 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest user) {
         if (userService.isAdmin(authentication)) {
-            try {
-                log.info("User object: {}", user);
-                return ResponseEntity.ok(userService.updateUser(id, user));
-            } catch (Exception e) {
-                throw new BadRequestException("Error while updating user");
-            }
+            log.info("###################################################" +
+                    "User id: {}", id +
+                    "#############################################");
+            log.info("User object: {}", user);
+            return ResponseEntity.ok(userService.updateUser(id, user));
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }

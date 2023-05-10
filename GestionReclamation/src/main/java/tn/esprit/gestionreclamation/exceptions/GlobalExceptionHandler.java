@@ -1,6 +1,7 @@
 package tn.esprit.gestionreclamation.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,13 +11,21 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.Date;
 
 @ControllerAdvice
+@Slf4j
+
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorObject> handleBadRequestException(BadRequestException e) {
         ErrorObject errorObject = new ErrorObject();
         errorObject.setStatusCode(400);
+        log.info("#######################################################################################" +
+                "Error message: {}" +
+                e.getMessage()+
+                "#######################################################################################"
+        );
         errorObject.setMessage(e.getMessage());
+
         errorObject.setDate(new Date());
         errorObject.setType(e.getClass().getTypeName());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorObject);

@@ -81,6 +81,9 @@ public class UserService {
 //    }
 
     public UserResponse updateUser(Long id, UserRequest user) {
+        log.info("\n\nall users: {}\n\n", getAllUsers());
+        log.info("\n\nUpdating user with id: {}\n\n", id);
+        log.info("\n\nUpdating user with id: {}\n\n", user);
         Users userToUpdate = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         Role role = roleService.getRoleById(user.getRole());
