@@ -117,6 +117,7 @@ public class UserService {
     public UserResponse mapToUserResponse(Users user) {
         return UserResponse.builder()
                 .id(user.getId())
+                .db_id(user.getDb_id())
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
