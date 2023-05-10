@@ -3,6 +3,7 @@ package tn.esprit.gestionreclamation.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.gestionreclamation.exceptions.ForbiddenException;
+import tn.esprit.gestionreclamation.exceptions.UserNotAuthorizedException;
 import tn.esprit.gestionreclamation.models.Role;
 import tn.esprit.gestionreclamation.services.Authentication;
 import tn.esprit.gestionreclamation.services.RoleService;
@@ -54,8 +55,12 @@ public class RoleController {
     @DeleteMapping("/{id}")
     public void deleteRole(@PathVariable Long id) {
         if (userService.isAdmin(authentication)) {
-            roleService.deleteRole(id);
+            if(userService.getByRoleId(id).isEmpty()){
+                roleService.deleteRole(id);
+            } else {
+                throw new IllegalArgumentException("Make sure no users have that role first");
+            }
         }
-        throw new ForbiddenException("You are not authorized to perform this action");
+        throw new UserNotAuthorizedException("You are not authorized to perform this action");
     }
 }
