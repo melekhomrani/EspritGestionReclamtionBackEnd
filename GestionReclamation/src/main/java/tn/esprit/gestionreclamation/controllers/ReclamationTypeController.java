@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.gestionreclamation.dto.ReclamationTypeRequest;
 import tn.esprit.gestionreclamation.exceptions.ForbiddenException;
 import tn.esprit.gestionreclamation.models.ReclamationType;
+import tn.esprit.gestionreclamation.services.AccessFlowService;
 import tn.esprit.gestionreclamation.services.Authentication;
 import tn.esprit.gestionreclamation.services.ReclamationTypeService;
 import tn.esprit.gestionreclamation.services.UserService;
@@ -19,6 +20,7 @@ public class ReclamationTypeController {
     private final ReclamationTypeService reclamationTypeService;
     private final UserService userService;
     final Authentication authentication;
+    final AccessFlowService accessFlowService;
 
     @GetMapping
     public List<ReclamationType> getAllReclamationTypes() {
@@ -58,6 +60,7 @@ public class ReclamationTypeController {
     public void deleteReclamationType(@PathVariable Long id) {
         if (userService.isAdmin(authentication)) {
             reclamationTypeService.deleteReclamationType(id);
+            accessFlowService.deleteAccessFlow(accessFlowService.getAccessFlowByTypeId(id).getId());
         }
         throw new ForbiddenException("You are not authorized to perform this action");
     }
