@@ -32,6 +32,7 @@ public class UserService {
         return userRepository.findAll().stream().map(this::mapToUserResponse).toList();
     }
 
+
     public UserResponse getUserById(Long id) {
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -102,7 +103,7 @@ public class UserService {
     public void deleteUser(Long id) {
         Users userToDelete = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        userRepository.deleteById(userToDelete.getId());
+        userRepository.deleteById(userToDelete.getDbId());
         rabbitTemplate.convertAndSend("","q.delete-user", id);
     }
 
@@ -117,7 +118,7 @@ public class UserService {
     public UserResponse mapToUserResponse(Users user) {
         return UserResponse.builder()
                 .id(user.getId())
-                .db_id(user.getDb_id())
+                .dbid(user.getDbId())
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())

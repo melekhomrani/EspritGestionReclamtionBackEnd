@@ -26,7 +26,7 @@ import java.util.List;
 public class Users{
     @Id
     @GeneratedValue
-    private Long db_id;
+    private Long dbId;
 
     private Long id;
     @Column(unique = true)

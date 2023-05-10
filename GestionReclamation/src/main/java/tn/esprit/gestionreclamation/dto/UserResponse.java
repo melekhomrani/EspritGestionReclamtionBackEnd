@@ -18,7 +18,7 @@ public class UserResponse {
     private String email;
     private String firstName;
     private String lastName;
-    private Long db_id;
+    private Long dbid;
     private Role role;
     private LocalDateTime dateCreation;
     private LocalDateTime dateModification;
