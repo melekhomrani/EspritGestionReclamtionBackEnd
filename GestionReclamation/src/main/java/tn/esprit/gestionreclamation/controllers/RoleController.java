@@ -57,6 +57,7 @@ public class RoleController {
         if (userService.isAdmin(authentication)) {
             if(userService.getByRoleId(id).isEmpty()){
                 roleService.deleteRole(id);
+                return;
             } else {
                 throw new IllegalArgumentException("Make sure no users have that role first");
             }
