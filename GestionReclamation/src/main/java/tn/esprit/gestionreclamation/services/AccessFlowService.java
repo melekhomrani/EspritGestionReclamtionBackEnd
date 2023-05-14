@@ -144,11 +144,14 @@ public class AccessFlowService {
         if (user.isPresent()) {
             Role role = roleService.getRoleById(user.get().getRole().getId());
             var accessFlowTab = accessFlowRepository.findAccessFlowsByCreateContaining(role);
-            List<ReclamationType> allowedTypes = List.of(null);
+            if (accessFlowTab.isEmpty()) {
+                return List.of(null);
+            }
+            List<ReclamationType> allowedTypes = new java.util.ArrayList<>();
             accessFlowTab.forEach((i) -> allowedTypes.add(i.getReclamationType()));
             return allowedTypes;
         }
-        throw new AccessDeniedException("Not Authenticated");
+        else throw new AccessDeniedException("Not Authenticated");
     }
 
     public List<ReclamationType> findAllowedToConsultTypes(Authentication authentication) throws AccessDeniedException {
