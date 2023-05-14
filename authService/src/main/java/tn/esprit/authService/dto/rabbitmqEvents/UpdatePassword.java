@@ -13,5 +13,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class UpdatePassword implements Serializable {
     private Long id;
-    private String password;
+    private String oldPassword;
+    private String newPassword;
 }

@@ -49,9 +49,27 @@ public class AccessFlowController {
         throw new ForbiddenException("You are not authorized");
     }
 
+    @PostMapping
+    public AccessFlow createAccessFlow(@RequestBody AccessFlowRequest accessFlow){
+        if(userService.isAdmin(authentication)){
+            log.info("#################################################");
+            log.info("create access flow for reclamation type id: {}", accessFlow.getReclamationTypeId());
+            log.info("#################################################");
+            log.info(("access flow: {}"), accessFlow);
+            log.info("#################################################");
+            return accessFlowService.saveNewAccessFlow(accessFlow);
+        }
+        throw new ForbiddenException("You are not authorized");
+    }
+
     @PutMapping("/{id}")
     public AccessFlow updateAccessFlow(@RequestBody AccessFlowRequest accessFlow, @PathVariable Long id){
         if(userService.isAdmin(authentication)){
+            log.info("#################################################");
+            log.info("update access flow for reclamation type id: {}", id);
+            log.info("#################################################");
+            log.info(("access flow: {}"), accessFlow);
+            log.info("#################################################");
             return accessFlowService.updateAccessFlow(id, accessFlow);
         }
         throw new ForbiddenException("You are not authorized");

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.gestionreclamation.dto.UserRequest;
 import tn.esprit.gestionreclamation.dto.UserResponse;
+import tn.esprit.gestionreclamation.dto.rabbitmqEvents.UpdatePassword;
 import tn.esprit.gestionreclamation.exceptions.BadRequestException;
 import tn.esprit.gestionreclamation.exceptions.ForbiddenException;
 import tn.esprit.gestionreclamation.exceptions.UserNotAuthorizedException;
@@ -93,10 +94,11 @@ public class UserController {
     }
 
     @PutMapping("/password/{id}")
-    public ResponseEntity<String> updatePassword(@PathVariable Long id, @RequestBody String password) {
-        if (userService.isAdmin(authentication)) {
+    public ResponseEntity<String> updatePassword(@PathVariable Long id, @RequestBody UpdatePassword updatePassword) {
+        if (userService.isAdmin(authentication) || userService.isMe(id, authentication)) {
             try {
-                userService.updatePassword(id, password);
+                var res = userService.updatePassword(id, updatePassword.getNewPassword(), updatePassword.getOldPassword());
+                if (res == false) throw new BadRequestException("Error while updating password");
                 return ResponseEntity.ok("Password updated successfully");
             } catch (Exception e) {
                 throw new BadRequestException("Error while updating password");

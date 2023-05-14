@@ -38,12 +38,24 @@ public class RabbitmqServices {
     @RabbitListener(queues = {"q.update-password"})
     public void updatePassword(UpdatePassword updatePassword){
         var user = credentialsRepository.findById(updatePassword.getId());
-        if(user.isPresent()){
-            var updated = user.get();
-            updated.setPassword(passwordEncoder.encode(updatePassword.getPassword()));
-            credentialsRepository.save(updated);
-        }else{
-            log.warn("Couldn't update User with id: " + updatePassword.getId() + " / Could Not find User");
+        try {
+            if(user.isPresent()){
+                var updated = user.get();
+                // check if old password is correct
+                if(!passwordEncoder.matches(updatePassword.getOldPassword(), updated.getPassword())){
+                    log.warn("Couldn't update User with id: " + updatePassword.getId() + " / Old Password is incorrect");
+                    throw new RuntimeException("Old Password is incorrect");
+                }else {
+                    updated.setPassword(passwordEncoder.encode(updatePassword.getNewPassword()));
+                    credentialsRepository.save(updated);
+                }
+
+            }else{
+                log.warn("Couldn't update User with id: " + updatePassword.getId() + " / Could Not find User");
+                throw new RuntimeException("Could Not find User");
+            }
+        } catch (Exception e) {
+            log.warn("Couldn't update User with id: " + updatePassword.getId() + " / " + e.getMessage());
         }
     }
 }

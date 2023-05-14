@@ -94,10 +94,18 @@ public class UserService {
         return mapToUserResponse(userRepository.saveAndFlush(userToUpdate));
     }
 
-    public boolean updatePassword(Long id, String password){
+    public boolean updatePassword(Long id, String newPassword, String oldPassword){
         var user = getUserById(id);
-        rabbitTemplate.convertAndSend("", "q.update-password", UpdatePassword.builder().password(password).id(id).build());
-        return true;
+        if(user == null){
+            throw new EntityNotFoundException("User not found");
+        }
+        try {
+            rabbitTemplate.convertAndSend("", "q.update-password", UpdatePassword.builder().newPassword(newPassword).oldPassword(oldPassword).id(id).build());
+            return true;
+        } catch (Exception e) {
+            log.error("Error updating password: {}", e.getMessage());
+            return false;
+        }
     }
 
     public void deleteUser(Long id) {
@@ -138,5 +146,8 @@ public class UserService {
 
     public Optional<Users> getByRoleId(Long id){
         return userRepository.findByRoleId(id);
+    }
+    public Boolean isMe(Long id,Authentication authentication) {
+        return authentication.getProfile().getId().equals(id);
     }
 }

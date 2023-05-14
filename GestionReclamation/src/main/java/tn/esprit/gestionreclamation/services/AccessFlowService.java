@@ -41,14 +41,26 @@ public class AccessFlowService {
         return accessFlowRepository.findById(accessFlow.getId()).get();
     }
 
+    public AccessFlow saveAccessFlow(AccessFlow accessFlow){
+        return accessFlowRepository.saveAndFlush(accessFlow);
+    }
 
-    public AccessFlow saveAccessFlow(AccessFlow accessFlow) {
-        Optional<AccessFlow> checkAccessFlow = accessFlowRepository.findByReclamationTypeId(accessFlow.getReclamationType().getId());
-        if (checkAccessFlow.isPresent()) {
-            throw new EntityNotFoundException("AccessFlow already exists");
-        }
-        //todo : naaresh bedhabet
-        return accessFlowRepository.save(accessFlow);
+    public AccessFlow saveNewAccessFlow(AccessFlowRequest accessFlow) {
+        var type = reclamationTypeService.getReclamationTypeById(accessFlow.getReclamationTypeId());
+        List<Role> approveRoles = roleService.getRolesByIds(accessFlow.getApproveId().stream().toList());
+        List<Role> consultRoles = roleService.getRolesByIds(accessFlow.getConsultId().stream().toList());
+        List<Role> creatRoles = roleService.getRolesByIds(accessFlow.getCreateId().stream().toList());
+        List<Role> notifyRoles = roleService.getRolesByIds(accessFlow.getNotifyId().stream().toList());
+        List<Role> validateRoles = roleService.getRolesByIds(accessFlow.getValidateId().stream().toList());
+        AccessFlow accessFlowToSave = AccessFlow.builder()
+                .approve(approveRoles)
+                .consult(consultRoles)
+                .create(creatRoles)
+                .notify(notifyRoles)
+                .validate(validateRoles)
+                .reclamationType(type)
+                .build();
+        return accessFlowRepository.saveAndFlush(accessFlowToSave);
     }
 
     public List<AccessFlow> saveAccessFlows(List<AccessFlow> accessFlows) {
