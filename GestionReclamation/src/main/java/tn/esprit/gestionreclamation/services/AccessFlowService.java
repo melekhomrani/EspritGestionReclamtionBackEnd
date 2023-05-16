@@ -145,7 +145,7 @@ public class AccessFlowService {
             Role role = roleService.getRoleById(user.get().getRole().getId());
             var accessFlowTab = accessFlowRepository.findAccessFlowsByCreateContaining(role);
             if (accessFlowTab.isEmpty()) {
-                return List.of(null);
+                return List.of(new ReclamationType());
             }
             List<ReclamationType> allowedTypes = new java.util.ArrayList<>();
             accessFlowTab.forEach((i) -> allowedTypes.add(i.getReclamationType()));
