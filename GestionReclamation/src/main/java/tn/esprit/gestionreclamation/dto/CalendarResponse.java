@@ -13,5 +13,5 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class CalendarResponse {
     LocalDate day;
-    Integer value;
+    Long value;
 }

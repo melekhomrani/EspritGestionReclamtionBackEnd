@@ -121,34 +121,24 @@ public class ReclamationService {
         reclamationRepository.saveAndFlush(reclamation);
     }
 
+
+
     @Async
-    public CompletableFuture<ArrayList<CalendarResponse>> getCalendarData(LocalDate start, LocalDate end) {
-        ArrayList<CalendarResponse> dailyCount = new ArrayList<CalendarResponse>();
+    public CompletableFuture<ArrayList<CalendarResponse>> getCalendarData(LocalDate start, LocalDate end){
+        ArrayList<CalendarResponse> dailyCount = new ArrayList<>();
+        List<Reclamation> reclams = reclamationRepository.findReclamationsByDateCreationIsBetween(start.atStartOfDay(), end.atStartOfDay().plusDays(1).minusSeconds(1));
+        reclams.sort(Comparator.comparing(Reclamation::getDateCreation));
         start.datesUntil(end).forEach(
-                d-> {
+                d ->{
                     dailyCount.add(CalendarResponse.builder()
-                            .value(reclamationRepository.countAllByDateCreationBetween(d.atStartOfDay(), d.atStartOfDay().plusDays(1).minusSeconds(1)))
-                            .day(d)
-                            .build()
-                    );
+                            .value(reclams.stream().filter(reclamation -> {
+                                return reclamation.getDateCreation().toLocalDate().atStartOfDay().equals(d.atStartOfDay());
+                            }).count()
+                    ).day(d).build());
                 }
         );
         return CompletableFuture.completedFuture(dailyCount);
     }
-
-//    @Async
-//    public CompletableFuture<ArrayList<CalendarResponse>> getCalendarData(LocalDate start, LocalDate end){
-//        ArrayList<CalendarResponse> dailyCount = new ArrayList<>();
-//        List<Reclamation> reclams = reclamationRepository.findReclamationsByDateCreationIsBetween(start.atStartOfDay(), end.atStartOfDay().plusDays(1).minusSeconds(1));
-//        reclams.sort(Comparator.comparing(Reclamation::getDateCreation));
-//        start.datesUntil(end).forEach(
-//                d ->{
-//                    dailyCount.add(CalendarResponse.builder()
-//                            .value(reclams.stream().filter())
-//                    )
-//                }
-//        );
-//    }
 
 
     public String getFrontUrl(Long id){
