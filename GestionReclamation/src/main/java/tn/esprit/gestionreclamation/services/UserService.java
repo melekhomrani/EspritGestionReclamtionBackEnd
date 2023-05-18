@@ -11,6 +11,8 @@ import tn.esprit.gestionreclamation.dto.UserResponse;
 import tn.esprit.gestionreclamation.dto.rabbitmqEvents.UpdateEmailMsg;
 import tn.esprit.gestionreclamation.dto.rabbitmqEvents.UpdatePassword;
 import tn.esprit.gestionreclamation.exceptions.AlreadyExistsException;
+import tn.esprit.gestionreclamation.models.AccessFlow;
+import tn.esprit.gestionreclamation.models.Reclamation;
 import tn.esprit.gestionreclamation.models.Role;
 import tn.esprit.gestionreclamation.models.Users;
 import tn.esprit.gestionreclamation.repositories.UserRepository;
@@ -149,5 +151,15 @@ public class UserService {
     }
     public Boolean isMe(Long id,Authentication authentication) {
         return authentication.getProfile().getId().equals(id);
+    }
+
+    public Boolean canConsult(Authentication authentication, Reclamation reclamation, AccessFlow accessFlow){
+        if(accessFlow.getConsult().contains(authentication.getProfile().getRole()) ||
+                accessFlow.getValidate().contains(authentication.getProfile().getRole()) ||
+                accessFlow.getApprove().contains(authentication.getProfile().getRole()) ||
+                isAdmin(authentication)
+        ){
+            return true;
+        } else return reclamation.getAuthor().equals(authentication.getProfile());
     }
 }

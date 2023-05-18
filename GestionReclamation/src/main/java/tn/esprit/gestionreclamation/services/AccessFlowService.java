@@ -213,4 +213,8 @@ public class AccessFlowService {
         List<AccessFlow> accessFlowsToDelete = Collections.singletonList(accessFlows.orElse(null));
         accessFlowRepository.deleteAll(accessFlowsToDelete);
     }
+
+    public List<AccessFlow> getByApproveAndValidateIn(Role role){
+        return accessFlowRepository.findAccessFlowsByApproveIdOrValidateId(role.getId(), role.getId());
+    }
 }

@@ -3,6 +3,7 @@ package tn.esprit.gestionreclamation.services;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tn.esprit.gestionreclamation.dto.CalendarResponse;
@@ -11,13 +12,13 @@ import tn.esprit.gestionreclamation.dto.UpdateProgressRequest;
 import tn.esprit.gestionreclamation.exceptions.BadRequestException;
 import tn.esprit.gestionreclamation.models.Progress;
 import tn.esprit.gestionreclamation.models.Reclamation;
+import tn.esprit.gestionreclamation.models.ReclamationType;
+import tn.esprit.gestionreclamation.models.Users;
 import tn.esprit.gestionreclamation.repositories.ReclamationRepository;
 
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -135,6 +136,21 @@ public class ReclamationService {
         return CompletableFuture.completedFuture(dailyCount);
     }
 
+//    @Async
+//    public CompletableFuture<ArrayList<CalendarResponse>> getCalendarData(LocalDate start, LocalDate end){
+//        ArrayList<CalendarResponse> dailyCount = new ArrayList<>();
+//        List<Reclamation> reclams = reclamationRepository.findReclamationsByDateCreationIsBetween(start.atStartOfDay(), end.atStartOfDay().plusDays(1).minusSeconds(1));
+//        reclams.sort(Comparator.comparing(Reclamation::getDateCreation));
+//        start.datesUntil(end).forEach(
+//                d ->{
+//                    dailyCount.add(CalendarResponse.builder()
+//                            .value(reclams.stream().filter())
+//                    )
+//                }
+//        );
+//    }
+
+
     public String getFrontUrl(Long id){
         return frontUrl + "/reclamation/" + id.toString();
     }
@@ -160,5 +176,18 @@ public class ReclamationService {
             default -> throw new BadRequestException("Invalid State");
         });
 
+    }
+
+    public List<Reclamation> getMine(Users author) {
+        return reclamationRepository.findByAuthor(author);
+    }
+
+    public List<Reclamation> getNeeded(Authentication authentication){
+        var accessFlows = accessFlowService.getByApproveAndValidateIn(authentication.getProfile().getRole());
+        List<ReclamationType> typesTable = List.of();
+        accessFlows.forEach(accessFlow -> {
+            typesTable.add(accessFlow.getReclamationType());
+        });
+        return reclamationRepository.findReclamationsByTypeIsInAndProgressIsNotIn(typesTable, List.of(Progress.DONE, Progress.CANCELLED));
     }
 }

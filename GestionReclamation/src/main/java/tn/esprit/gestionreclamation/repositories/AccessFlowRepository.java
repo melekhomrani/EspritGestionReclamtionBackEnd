@@ -1,5 +1,6 @@
 package tn.esprit.gestionreclamation.repositories;
 
+import jakarta.persistence.Access;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import tn.esprit.gestionreclamation.models.AccessFlow;
@@ -22,5 +23,7 @@ public interface AccessFlowRepository extends JpaRepository<AccessFlow, Long> {
     List<AccessFlow> findAccessFlowsByApproveContaining(Role role);
 
     List<AccessFlow> findAccessFlowsByValidateContaining(Role role);
+
+    List<AccessFlow> findAccessFlowsByApproveIdOrValidateId(Long roleId, Long sameRoleId);
 
 }

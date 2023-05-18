@@ -60,6 +60,16 @@ public class ReclamationController {
         throw new UserNotAuthorizedException("Not Authorized");
     }
 
+    @GetMapping("/mine")
+    public ResponseEntity<List<Reclamation>> getMine(){
+        return ResponseEntity.ok(reclamationService.getMine(authentication.getProfile()));
+    }
+
+    @GetMapping("/needed")
+    public ResponseEntity<List<Reclamation>> getNeeded(){
+        return ResponseEntity.ok(reclamationService.getNeeded(authentication));
+    }
+
     @PostMapping
     public ResponseEntity<Reclamation> createReclamation(@RequestBody ReclamationRequest reclamationRequest) throws AccessDeniedException {
         var user = authentication.getProfile();

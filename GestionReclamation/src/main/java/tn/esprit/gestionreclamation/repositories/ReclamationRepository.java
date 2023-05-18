@@ -18,4 +18,9 @@ public interface ReclamationRepository extends JpaRepository<Reclamation, Long> 
     Integer countAllByAuthor(Users user);
 
     Integer countAllByAuthorAndProgress(Users user, Progress progress);
+
+    List<Reclamation> findByAuthor(Users users);
+
+    List<Reclamation> findReclamationsByTypeIsInAndProgressIsNotIn(List<ReclamationType> types, List<Progress> progress);
+    List<Reclamation> findReclamationsByDateCreationIsBetween(LocalDateTime start, LocalDateTime end);
 }
