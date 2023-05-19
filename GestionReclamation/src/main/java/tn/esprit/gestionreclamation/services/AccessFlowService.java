@@ -2,6 +2,7 @@ package tn.esprit.gestionreclamation.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.ast.Var;
 import org.springframework.stereotype.Service;
 import tn.esprit.gestionreclamation.dto.AccessFlowRequest;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class AccessFlowService {
 
     private final AccessFlowRepository accessFlowRepository;
@@ -81,7 +83,8 @@ public class AccessFlowService {
         accessFlowToUpdate.setCreate(creatRoles);
         accessFlowToUpdate.setNotify(notifyRoles);
         accessFlowToUpdate.setValidate(validateRoles);
-        return accessFlowRepository.save(accessFlowToUpdate);
+        log.info("Updated AFlow: {}", accessFlowToUpdate);
+        return accessFlowRepository.saveAndFlush(accessFlowToUpdate);
 
     }
 
