@@ -10,10 +10,7 @@ import tn.esprit.gestionreclamation.dto.CalendarResponse;
 import tn.esprit.gestionreclamation.dto.ReclamationRequest;
 import tn.esprit.gestionreclamation.dto.UpdateProgressRequest;
 import tn.esprit.gestionreclamation.exceptions.BadRequestException;
-import tn.esprit.gestionreclamation.models.Progress;
-import tn.esprit.gestionreclamation.models.Reclamation;
-import tn.esprit.gestionreclamation.models.ReclamationType;
-import tn.esprit.gestionreclamation.models.Users;
+import tn.esprit.gestionreclamation.models.*;
 import tn.esprit.gestionreclamation.repositories.ReclamationRepository;
 
 import java.nio.file.AccessDeniedException;
@@ -179,5 +176,12 @@ public class ReclamationService {
             typesTable.add(accessFlow.getReclamationType());
         });
         return reclamationRepository.findReclamationsByTypeIsInAndProgressIsNotIn(typesTable, List.of(Progress.DONE, Progress.CANCELLED));
+    }
+
+    public Boolean canSetState(Authentication authentication, Long id){
+        if(userService.isAdmin(authentication)) return true;
+        Reclamation reclamation = getReclamationById(id).orElseThrow();
+        AccessFlow accessFlow = accessFlowService.getAccessFlowByReclamation(reclamation).orElseThrow();
+        return accessFlow.getApprove().contains(authentication.getProfile().getRole()) || accessFlow.getValidate().contains(authentication.getProfile().getRole());
     }
 }

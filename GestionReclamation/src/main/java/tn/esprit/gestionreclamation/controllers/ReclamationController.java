@@ -70,6 +70,11 @@ public class ReclamationController {
         return ResponseEntity.ok(reclamationService.getNeeded(authentication));
     }
 
+    @GetMapping("/canSetState/{id}")
+    public ResponseEntity<Boolean> getCanSetState(@PathVariable Long id){
+        return ResponseEntity.ok(reclamationService.canSetState(authentication, id));
+    }
+
     @PostMapping
     public ResponseEntity<Reclamation> createReclamation(@RequestBody ReclamationRequest reclamationRequest) throws AccessDeniedException {
         var user = authentication.getProfile();
