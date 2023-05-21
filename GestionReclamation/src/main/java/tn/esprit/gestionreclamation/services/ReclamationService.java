@@ -2,6 +2,7 @@ package tn.esprit.gestionreclamation.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -20,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class ReclamationService {
 
     private final ReclamationRepository reclamationRepository;
@@ -171,7 +173,8 @@ public class ReclamationService {
 
     public List<Reclamation> getNeeded(Authentication authentication){
         var accessFlows = accessFlowService.getByApproveAndValidateIn(authentication.getProfile().getRole());
-        List<ReclamationType> typesTable = List.of();
+        log.info("AccessFlowsssss: {}", accessFlows);
+        List<ReclamationType> typesTable = new ArrayList<>(List.of());
         accessFlows.forEach(accessFlow -> {
             typesTable.add(accessFlow.getReclamationType());
         });
