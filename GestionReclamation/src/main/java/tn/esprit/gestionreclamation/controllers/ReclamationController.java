@@ -19,7 +19,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -81,26 +80,8 @@ public class ReclamationController {
         var accessFlowTable = accessFlowService.getAccessFlowByTypeId(reclamationRequest.getTypeId());
         if(userService.isAuthorized(user.getRole(), accessFlowTable.getCreate()) || userService.isAdmin(authentication)){
             var newReclamation = reclamationService.saveReclamation(reclamationRequest, authentication);
-            notificationService.notifyList(accessFlowTable.getNotify(), EmailDetailsAsync.builder()
-                    .action("Creer")
-                    .subject("Esprit CRM Notification:")
-                    .actionDoer(authentication.getProfile())
-                    .withButton(true)
-                    .buttonLink(frontUrl+"/reclamations/"+newReclamation.getId())
-                    .buttonText("Clickez Ici Pour Consulter")
-                    .recipient(authentication.getProfile())
-                    .build()
-            );
-            notificationService.notifyList(accessFlowTable.getApprove(), EmailDetailsAsync.builder()
-                    .action("Creer")
-                    .subject("Esprit CRM Notification:")
-                    .actionDoer(authentication.getProfile())
-                    .withButton(true)
-                    .buttonLink(frontUrl+"/reclamation/"+newReclamation.getId())
-                    .buttonText("Clickez Ici Pour Consulter")
-                    .recipient(authentication.getProfile())
-                    .build()
-            );
+            notificationService.notifyAuthor(newReclamation, "creer", newReclamation.getAuthor());
+            notificationService.getListsAndNotify(newReclamation, "creer", newReclamation.getAuthor());
             return ResponseEntity.ok(newReclamation);
         }
         return ResponseEntity.badRequest().build();
@@ -109,18 +90,10 @@ public class ReclamationController {
     @PutMapping("/progress/{id}")
     public ResponseEntity<Reclamation> updateProgress(@PathVariable Long id, @RequestBody UpdateProgressRequest updateProgressRequest){
         var updatedReclamation = reclamationService.updateProgress(id, authentication, updateProgressRequest);
-        if(updatedReclamation != null) return ResponseEntity.ok(updatedReclamation);
-        notificationService.getListsAndNotify(updatedReclamation, EmailDetailsAsync.builder()
-                .action("Modifier l'etat")
-                .actionDoer(authentication.getProfile())
-                .subject("Esprit CRM Notification")
-                .withButton(true)
-                .buttonLink(frontUrl+"/reclamation/"+ updatedReclamation.getId())
-                .buttonText("Consulter Ici")
-                .recipient(authentication.getProfile())
-                .build()
-        );
-        return ResponseEntity.badRequest().build();
+        if(updatedReclamation == null) return ResponseEntity.badRequest().build();
+        notificationService.notifyAuthor(updatedReclamation, "mis a jour", authentication.getProfile());
+        notificationService.getListsAndNotify(updatedReclamation, "mis a jour", authentication.getProfile());
+        return ResponseEntity.ok(updatedReclamation);
     }
 
     @DeleteMapping("/{id}")

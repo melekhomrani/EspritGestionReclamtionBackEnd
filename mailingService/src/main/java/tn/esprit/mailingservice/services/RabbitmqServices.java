@@ -17,6 +17,7 @@ public class RabbitmqServices {
 
     @RabbitListener(queues = {"q.send-mail"})
     public void onSendMail(EmailDetails emailDetails){
+        log.info("Sending mail...!!!");
         emailService.sendMailWithAttachements(emailDetails);
         log.info(
                 "Sending Mail {\n"

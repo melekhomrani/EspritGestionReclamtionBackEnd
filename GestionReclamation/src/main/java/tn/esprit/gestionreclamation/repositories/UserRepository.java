@@ -16,8 +16,6 @@ public interface UserRepository extends JpaRepository<Users, Long> {
     List<Users> findAllByRole(Role role);
     List<Users> findAllByRoleIn(List<Role> roles);
 
-    Long countUsers();
-
     Optional<Users> findByRoleId(Long id);
 
     @Query("SELECT u FROM Users u WHERE u.id = ?1")

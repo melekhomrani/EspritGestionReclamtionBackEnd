@@ -167,8 +167,4 @@ public class UserService {
     public List<Users> getAllInRolesList(List<Role> rolesList){
         return userRepository.findAllByRoleIn(rolesList);
     }
-
-    public Long getUserCount() {
-        return userRepository.countUsers();
-    }
 }
