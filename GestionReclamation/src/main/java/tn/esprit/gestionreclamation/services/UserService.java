@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import tn.esprit.gestionreclamation.dto.UserRequest;
 import tn.esprit.gestionreclamation.dto.UserResponse;
@@ -161,5 +162,13 @@ public class UserService {
         ){
             return true;
         } else return reclamation.getAuthor().equals(authentication.getProfile());
+    }
+
+    public List<Users> getAllInRolesList(List<Role> rolesList){
+        return userRepository.findAllByRoleIn(rolesList);
+    }
+
+    public Long getUserCount() {
+        return userRepository.countUsers();
     }
 }

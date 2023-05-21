@@ -116,4 +116,14 @@ public class UserController {
             throw new UserNotAuthorizedException("You are not authorized to delete a user");
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> getUserCount(){
+        if(userService.isAdmin(authentication)){
+            return ResponseEntity.ok(userService.getUserCount());
+        }
+        throw new ForbiddenException("Forbidden");
+    }
+
+
+
 }
