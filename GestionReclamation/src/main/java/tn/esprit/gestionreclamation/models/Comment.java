@@ -1,9 +1,6 @@
 package tn.esprit.gestionreclamation.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,5 +28,6 @@ public class Comment {
     private LocalDateTime dateCreation;
     @UpdateTimestamp
     private LocalDateTime dateModification;
+    @Column(columnDefinition = "boolean default true")
     private Boolean visibility = true;
 }
