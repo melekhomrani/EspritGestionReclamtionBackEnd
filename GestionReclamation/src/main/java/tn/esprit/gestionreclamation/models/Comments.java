@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Comment {
+public class Comments {
     @Id
     @GeneratedValue
     private Long id;
@@ -28,6 +28,5 @@ public class Comment {
     private LocalDateTime dateCreation;
     @UpdateTimestamp
     private LocalDateTime dateModification;
-    @Column(columnDefinition = "boolean default true")
     private Boolean visibility = true;
 }
