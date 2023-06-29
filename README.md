@@ -19,7 +19,7 @@ The Esprit Reclamations Web App is a platform designed to facilitate the process
 
 ## Technologies Used
 
-- Frontend: TavaScript, React.js
+- Frontend: TypeScript, React.js
 - Backend: Springboot
 - Database: Oracle
 - Authentication: JSON Web Tokens (JWT)
